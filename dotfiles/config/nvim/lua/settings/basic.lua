@@ -32,6 +32,8 @@ end
 local global = {
   mnowrapscan = true, -- 検索が最下部で止まる（ファイルの先頭に戻らない）
   mapleader = " ",  -- leaderキーをスペースにする
+  lsp_log_file = "",  -- lspのログ出力をOFFにする (lsp_log_verboseとセット)   これをやらないとlspの補完や参照がとても重い
+  lsp_log_verbose = 1,
 }
 
 for k, v in pairs(global) do

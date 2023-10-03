@@ -49,12 +49,7 @@ return {
         },
         lualine_b = { 'filename', 'branch' },
         lualine_c = { 'fileformat' },
-        lualine_x = {
-          'diagnostics',
-          sources = { 'nvim_diagnostic', 'nvim_lsp' },
-          sections = { 'error', 'warn', 'info', 'hint' },
-          symbols = { error = ' ', warn = ' ', info = ' ', hint = '' },
-        },
+        lualine_x = {},
         lualine_y = { 'filetype', 'progress' },
         lualine_z = {
           { 'location', separator = { right = '' }, left_padding = 2 },

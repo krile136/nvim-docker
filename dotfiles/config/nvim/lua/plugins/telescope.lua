@@ -8,7 +8,10 @@ return {
     vim.keymap.set('n', '<S-f>', builtin.find_files, {}) -- ファイル名検索
     vim.keymap.set('n', '<S-h>', builtin.live_grep, {})   -- ファイル内文字列検索
     vim.keymap.set('n', '<S-j>', builtin.buffers, {})     -- buffer内検索
-    vim.keymap.set('n', '<leader>fh', builtin.help_tags, {})   
+    vim.keymap.set('n', '<leader>fh', builtin.help_tags, {})
+
+    vim.keymap.set('n', 'gr', builtin.lsp_references, {}) -- カーソル下の変数やメソッドや関数を使用している箇所一覧
+    vim.keymap.set('n', 'gi', builtin.lsp_implementations, {}) -- カーソル下の単語の実装一覧
 
     require('telescope').setup({
       defaults = {
@@ -18,7 +21,30 @@ return {
             ["<C-k>"] = "move_selection_previous",
           }
         }
-      }
+      },
+      pickers = {
+        find_files = {
+          layout_config = { width = 0.8},
+          theme = "dropdown",
+        },
+        live_grep = {
+          layout_config = { width = 0.8},
+          theme = "dropdown",
+        },
+        buffers = {
+          layout_config = { width = 0.8},
+          theme = "dropdown",
+        },
+        lsp_references = {
+          layout_config = { width = 0.8},
+          theme = "dropdown",
+        },
+        lsp_implementations = {
+          layout_config = { width = 0.8},
+          theme = "dropdown",
+        },
+      },
+
     })
 
   end
