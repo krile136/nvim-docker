@@ -21,13 +21,15 @@ nvim_lsp['gopls'].setup{
 		}}
 }
 
-nvim_lsp['html'].setup{
+nvim_lsp['volar'].setup{
     on_attach = custom_attach,
     flags = {
       debounce_text_changes = 150,
       },
     settings = {}
 }
+
+
 
 -- keyboard shortcut
 -- ctrl + o で定義ジャンプ元に戻れる

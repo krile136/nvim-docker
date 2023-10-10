@@ -2,7 +2,7 @@ FROM ubuntu:22.04
 
 RUN apt update && \
     apt-get update && \
-    apt install -y curl git ripgrep tar unzip vim wget build-essential nodejs golang-go
+    apt install -y curl git ripgrep tar unzip vim wget build-essential nodejs golang-go npm
 
 # （途中でlocation聞かれて -y だけでは突破できない）
 ENV DEBIAN_FRONTEND=noninteractive
@@ -23,6 +23,13 @@ RUN wget https://github.com/neovim/neovim/releases/download/v0.9.2/nvim-linux64.
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
 ENV PATH="/root/.cargo/bin:$PATH"
 RUN cargo install tree-sitter-cli
+
+# vue(typescript)のLSPのためにnpmを使うが、aptで入れているnpmは古いので
+# バージョン管理のnを使って最新版を入れる（ついでにnodejsも最新版にする）
+RUN npm install n -g
+RUN n stable
+RUN apt purge -y nodejs npm
+RUN apt autoremove -y
 
 # composer install  php-cliとphp-mbstringを使っている（らしい）
 # インストールに失敗する場合は、hash値が違っている可能性が高いので公式を参考に修正する
