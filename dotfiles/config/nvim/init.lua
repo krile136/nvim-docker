@@ -22,6 +22,7 @@ require("lazy").setup({
   require('plugins/nvim-autopairs'),
   -- require('plugins/bufferline'),   -- うまく動かない
   require('plugins/fidget'),
+  require('plugins/phpfmt'),
 }, opts)
 
 
