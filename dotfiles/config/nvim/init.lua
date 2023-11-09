@@ -15,6 +15,7 @@ require("lazy").setup({
   -- require('plugins/noice'),  -- かっこいいけど重いので一旦使わない
   require('plugins/lspconfig'),
   require('plugins/mason'),
+  require('plugins/mason-tool-installer'),
   require('plugins/neoscroll'),
   require('plugins/nvim-cmp'),
   require('plugins/nvim-treesitter'),
