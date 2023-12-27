@@ -6,4 +6,5 @@ services:
         tty: true
         volumes:
             - ../projects:/usr/projects
+            - ./mason:/root/.local/share/nvim/mason
 
