@@ -2,7 +2,7 @@ FROM ubuntu:22.04
 
 RUN apt update && \
     apt-get update && \
-    apt install -y curl git ripgrep tar unzip vim wget build-essential nodejs golang-go npm
+    apt install -y curl git ripgrep tar unzip vim wget build-essential nodejs golang-go npm php-xml
 
 # （途中でlocation聞かれて -y だけでは突破できない）
 ENV DEBIAN_FRONTEND=noninteractive
