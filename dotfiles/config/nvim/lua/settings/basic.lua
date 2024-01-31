@@ -50,3 +50,13 @@ for k, v in pairs(windowOption) do
   vim.wo[k] = v
 end
 
+
+--------------------- yank highlighting ---------------------
+vim.api.nvim_exec([[
+augroup highlight_yank
+    autocmd!
+    autocmd TextYankPost * silent! lua vim.highlight.on_yank{higroup="IncSearch", timeout=300}
+augroup END
+]], false)
+
+

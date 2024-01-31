@@ -6,7 +6,7 @@ return {
       format_rules = {
         {
           pattern = {"*.php"},
-          command = "~/.local/share/nvim/mason/packages/phpcbf/phpcbf -q"
+          command = "~/.local/share/nvim/mason/packages/phpcbf/phpcbf --standard=PSR2"
         }
       }
     })

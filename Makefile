@@ -9,3 +9,6 @@ nvim:
 
 cp:
 	docker cp neovim:/root/.config/nvim ./dotfiles/config/
+
+build:
+	docker-compose build
