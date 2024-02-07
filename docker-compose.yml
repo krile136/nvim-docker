@@ -4,7 +4,14 @@ services:
         build: ./
         container_name: neovim
         tty: true
+        environment:
+          TZ: Asia/Tokyo
         volumes:
-            - ../projects:/usr/projects
-            - ./mason:/root/.local/share/nvim/mason
-
+            # プロジェクトディレクトリの同期
+            - ../projects:/usr/projects 
+            # nvimの設定を弄った時のために同期しておく
+            - ./dotfiles/config/nvim:/root/.config/nvim 
+            # LSPなどmasonでインストールするものは立ち上げるたびにインストールされるのでここで永続化
+            - ./mason:/root/.local/share/nvim/mason 
+            # nvimやLSPのキャッシュ　立ち上げるたびにindex作り直すので永続化
+            - ./cache:/root/.cache 

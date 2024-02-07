@@ -4,7 +4,7 @@ up:
 down:
 	docker-compose down
 
-nvim:
+n:
 	docker exec -it neovim /bin/bash
 
 cp:
