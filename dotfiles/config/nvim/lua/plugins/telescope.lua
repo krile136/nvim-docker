@@ -8,6 +8,7 @@ return {
     vim.keymap.set('n', '<S-f>', builtin.find_files, {}) -- ファイル名検索
     vim.keymap.set('n', '<S-h>', builtin.live_grep, {})   -- ファイル内文字列検索
     vim.keymap.set('n', '<S-j>', builtin.buffers, {})     -- buffer内検索
+    vim.keymap.set('n', '<S-w>', builtin.grep_string, {})     -- buffer内検索
     vim.keymap.set('n', '<leader>fh', builtin.help_tags, {})
 
     vim.keymap.set('n', 'gr', builtin.lsp_references, {}) -- カーソル下の変数やメソッドや関数を使用している箇所一覧
@@ -29,6 +30,10 @@ return {
           theme = "dropdown",
         },
         live_grep = {
+          layout_config = { width = 0.8},
+          theme = "dropdown",
+        },
+        grep_string = {
           layout_config = { width = 0.8},
           theme = "dropdown",
         },
