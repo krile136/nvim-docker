@@ -5,7 +5,7 @@ return {
     ensure_installed = { "lua", "go", "php" },
       highlight = {
         enable = true,
-		    indent = {
+        indent = {
 				  enable = true,
 		    },
       },

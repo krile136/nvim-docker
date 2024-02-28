@@ -15,7 +15,21 @@ return {
       },
       renderer = {
         group_empty = true,
+        highlight_git = true,
+		    icons = {
+			    glyphs = {
+				    git = {
+					    unstaged = '!', renamed = '»',
+					    untracked = '?', deleted = '✘',
+					    staged = '✓', unmerged = '', ignored = '◌',
+				    },
+			    },
+		    },
       },
+      git = {
+		    enable = true,
+		    ignore = false,
+	    },
       filters = {
         dotfiles = false,
       },

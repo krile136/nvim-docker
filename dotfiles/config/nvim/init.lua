@@ -14,7 +14,7 @@ require("lazy").setup({
   require('plugins/mason-tool-installer'),
   require('plugins/mason'),
   require('plugins/neoscroll'),
-  require('plugins/noice'),  -- かっこいいけど重いので一旦使わない
+  require('plugins/noice'),
   require('plugins/nvim-autopairs'),
   require('plugins/nvim-cmp'),
   require('plugins/nvim-scrollbar'),
@@ -24,5 +24,8 @@ require("lazy").setup({
   require('plugins/telescope'),
   require('plugins/vscode'),
 }, opts)
+
+--------------------- NvimTreeの色設定 ---------------------
+vim.cmd('hi NvimTreeExecFile guifg=#ffffff')
 
 
