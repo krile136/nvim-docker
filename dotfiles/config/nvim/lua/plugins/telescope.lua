@@ -5,11 +5,13 @@ return {
   },
   config = function()
     local builtin = require('telescope.builtin')
-    vim.keymap.set('n', '<S-f>', builtin.find_files, {}) -- ファイル名検索
-    vim.keymap.set('n', '<S-h>', builtin.live_grep, {})   -- ファイル内文字列検索
-    vim.keymap.set('n', '<S-j>', builtin.buffers, {})     -- buffer内検索
-    vim.keymap.set('n', '<S-w>', builtin.grep_string, {})     -- カーソル下の単語検索 
-    vim.keymap.set('n', '<S-l>', builtin.oldfiles, {})     -- 最近使ったファイル 
+    -- C-hとC-lはBTTにより仮想デスクトップの移動に割り当てているので使用しないように！
+    vim.keymap.set('n', '<C-j>', builtin.find_files, {}) -- ファイル名検索
+    vim.keymap.set('n', '<C-i>', builtin.live_grep, {})   -- ファイル内文字列検索
+    vim.keymap.set('n', '<C-k>', builtin.buffers, {})     -- buffer内検索
+    vim.keymap.set('n', '<C-w>', builtin.grep_string, {})     -- カーソル下の単語検索 
+    vim.keymap.set('n', '<C-;>', builtin.oldfiles, {})     -- 最近使ったファイル 
+    vim.keymap.set('n', '<C-g>', builtin.git_status, {})     -- 最近使ったファイル 
     vim.keymap.set('n', '<leader>fh', builtin.help_tags, {})
 
     vim.keymap.set('n', 'gr', builtin.lsp_references, {}) -- カーソル下の変数やメソッドや関数を使用している箇所一覧
@@ -39,6 +41,14 @@ return {
           theme = "dropdown",
         },
         buffers = {
+          layout_config = { width = 0.8},
+          theme = "dropdown",
+        },
+        oldfiles = {
+          layout_config = { width = 0.8},
+          theme = "dropdown",
+        },
+        git_status = {
           layout_config = { width = 0.8},
           theme = "dropdown",
         },
