@@ -9,6 +9,7 @@ require('settings/pluginSetup')
 
 require("lazy").setup({
   require('plugins/fidget'),
+  require('plugins/hlargs'),
   require('plugins/lspconfig'),
   require('plugins/lualine'),
   require('plugins/mason-tool-installer'),
