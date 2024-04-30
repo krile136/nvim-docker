@@ -1,6 +1,15 @@
 FROM ubuntu:22.04
 
 # fd-findはtelescopeのより高速なファイル検索に使うっぽい
+# 最新のミドルウェアを落とせるようにadd-apt-repositoryを使えるようにする
+RUN apt update && \
+    apt-get update && \
+    apt-get install -y software-properties-common
+
+# 最新のミドルウェアを落とせるようにする
+RUN add-apt-repository ppa:longsleep/golang-backports
+
+# ミドルウェアのインストール
 RUN apt update && \
     apt-get update && \
     apt install -y curl git ripgrep tar unzip vim wget build-essential nodejs golang-go npm php-xml fd-find
