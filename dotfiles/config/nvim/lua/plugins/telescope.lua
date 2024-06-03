@@ -24,7 +24,10 @@ return {
           i = {
             ["<C-j>"] = "move_selection_next",
             ["<C-k>"] = "move_selection_previous",
-            ['<c-d>'] = require('telescope.actions').delete_buffer
+            ["<C-d>"] = require('telescope.actions').delete_buffer,
+            ["<C-p>"] = function()
+              vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<C-r>0", true, true, true), 'i', true)
+            end
           }
         }
       },

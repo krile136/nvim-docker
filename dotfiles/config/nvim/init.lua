@@ -8,6 +8,7 @@ require('settings/keymap')
 require('settings/pluginSetup')
 
 require("lazy").setup({
+  require('plugins/comment'),
   require('plugins/fidget'),
   require('plugins/hlargs'),
   require('plugins/lspconfig'),
