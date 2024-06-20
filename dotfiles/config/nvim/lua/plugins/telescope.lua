@@ -7,13 +7,20 @@ return {
     local builtin = require('telescope.builtin')
     -- C-hとC-lはBTTにより仮想デスクトップの移動に割り当てているので使用しないように！
     -- control + 右手のキーで対応したいがコンフリクトも多い要調整
-    vim.keymap.set('n', '<C-j>', builtin.find_files, {}) -- ファイル名検索
+    --
     vim.keymap.set('n', '<C-i>', builtin.live_grep, {})   -- ファイル内文字列検索
-    vim.keymap.set('n', '<C-k>', builtin.buffers, {})     -- buffer内検索
     vim.keymap.set('n', '<C-y>', builtin.grep_string, {})     -- カーソル下の単語検索 
-    vim.keymap.set('n', '<C-;>', builtin.oldfiles, {})     -- 最近使ったファイル 
-    vim.keymap.set('n', '<C-g>', builtin.git_status, {})     -- 最近使ったファイル 
+    vim.keymap.set('n', '<C-g>', builtin.git_status, {})     -- git statusの結果一覧
+    vim.keymap.set('n', '<C-k>', builtin.spell_suggest, {})     -- spellの候補
     vim.keymap.set('n', '<leader>fh', builtin.help_tags, {})
+
+    vim.keymap.set("n", "<C-j>", function ()
+      require("telescope").extensions.smart_open.smart_open{
+        cwd_only = true,
+        theme = "dropdown",
+      } 
+    end, { noremap = true, silent = true })
+
 
     vim.keymap.set('n', 'gr', builtin.lsp_references, {}) -- カーソル下の変数やメソッドや関数を使用している箇所一覧
     vim.keymap.set('n', 'gi', builtin.lsp_implementations, {}) -- カーソル下の単語の実装一覧
