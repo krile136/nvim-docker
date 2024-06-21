@@ -21,10 +21,6 @@ return {
       } 
     end, { noremap = true, silent = true })
 
-
-    vim.keymap.set('n', 'gr', builtin.lsp_references, {}) -- カーソル下の変数やメソッドや関数を使用している箇所一覧
-    vim.keymap.set('n', 'gi', builtin.lsp_implementations, {}) -- カーソル下の単語の実装一覧
-
     require('telescope').setup({
       defaults = {
         mappings = {

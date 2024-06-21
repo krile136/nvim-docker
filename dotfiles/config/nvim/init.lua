@@ -7,12 +7,18 @@ require('settings/keymap')
 --------------------- plugins ---------------------
 require('settings/pluginSetup')
 
+local lazyOpts = {
+ 	ui = {
+	  border = "rounded",
+	},
+}
 require("lazy").setup({
   require('plugins/comment'),
   require('plugins/fidget'),
   require('plugins/hlargs'),
   require('plugins/lsp-signature'),
   require('plugins/lspconfig'),
+  require('plugins/lspsaga'),
   require('plugins/lualine'),
   require('plugins/mason-tool-installer'),
   require('plugins/mason'),
@@ -28,9 +34,16 @@ require("lazy").setup({
   require('plugins/smart-open'),
   require('plugins/telescope'),
   require('plugins/vscode'),
-}, opts)
+}, lazyOpts)
 
 --------------------- NvimTreeの色設定 ---------------------
 vim.cmd('hi NvimTreeExecFile guifg=#ffffff')
 
+
+
+--------------------- floatの背景色をなくす ---------------------
+vim.cmd [[
+  highlight NormalFloat guibg=NONE
+  highlight FloatBorder guibg=NONE
+]]
 

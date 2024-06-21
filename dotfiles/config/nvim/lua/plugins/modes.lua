@@ -14,5 +14,16 @@ return {
       end,
     })
 
+    -- 定義ジャンプ後にvキーがなぜか入力されてnoramモードなのに
+    -- visualモードの色になっているので、カーソル移動後にnormalなら
+    -- 強制的にdefaultに戻す
+    vim.api.nvim_create_autocmd('CursorMoved', {
+      callback = function()
+        if vim.fn.mode() == 'n' then
+        	require('modes').highlight('default')
+        end
+      end,
+    })
+
 	end
 }
