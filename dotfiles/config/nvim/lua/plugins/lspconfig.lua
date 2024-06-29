@@ -12,13 +12,22 @@ return {
       }, bufnr)
     end
 
-    nvim_lsp['phpactor'].setup{
+    -- nvim_lsp['phpactor'].setup{
+    --     on_attach = custom_attach,
+    --     flags = {
+    --       debounce_text_changes = 150,
+    --       },
+    --     settings = {}
+    -- }
+    
+    nvim_lsp['intelephense'].setup{
         on_attach = custom_attach,
         flags = {
           debounce_text_changes = 150,
           },
         settings = {}
     }
+
 
     nvim_lsp['gopls'].setup{
         on_attach = custom_attach,

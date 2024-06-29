@@ -7,6 +7,7 @@ return {
         'phpactor',   -- PHPのLSP
         'volar',      -- vue(typescript)のLSP
         'phpcbf',     -- PHPのフォーマッタ phpactorではフォーマットできないため
+        'intelephense'
       },
     }
   end
