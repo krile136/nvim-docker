@@ -47,6 +47,15 @@ return {
         settings = {}
     }
 
+    nvim_lsp['tsserver'].setup{
+        on_attach = custom_attach,
+        on_init = function(client, _)
+            client.server_capabilities.semanticTokensProvider = nil
+        end,
+        flag = {
+            debounce_text_changes = 150,
+        }
+    }
 
     -- keyboard shortcut
     -- ctrl + o で定義ジャンプ元に戻れる

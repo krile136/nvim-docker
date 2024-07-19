@@ -14,8 +14,12 @@ local lazyOpts = {
 }
 require("lazy").setup({
   require('plugins/comment'),
+  require('plugins/copilot-cmp'),  -- copilotより先に読み込む
+  require('plugins/copilot'),
+  require('plugins/copilotChat'),
   require('plugins/fidget'),
   require('plugins/hlargs'),
+  require('plugins/indent-blankline'),
   require('plugins/lsp-signature'),
   require('plugins/lspconfig'),
   require('plugins/lspsaga'),
@@ -25,7 +29,7 @@ require("lazy").setup({
   require('plugins/modes'),
   require('plugins/neoscroll'),
   require('plugins/noice'),
-  require('plugins/nvim-autopairs'),
+  -- require('plugins/nvim-autopairs'),   -- copilotと競合 カッコは手で入れよう
   require('plugins/nvim-cmp'),
   require('plugins/nvim-scrollbar'),
   require('plugins/nvim-simple-formatter'),

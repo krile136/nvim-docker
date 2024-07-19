@@ -46,10 +46,10 @@ return {
         lualine_a = {
           { 'mode' },
         },
-        lualine_b = { 'filename', 'branch' },
+        lualine_b = { 'filename', 'branch', 'diagnostics'},
         lualine_c = { 'fileformat' },
         lualine_x = { 'diff'},
-        lualine_y = { 'filetype', 'diagnostics' },
+        lualine_y = { 'filetype'},
         lualine_z = { 'location' },
       },
   
@@ -75,4 +75,3 @@ return {
 --   })
   end
 }
-

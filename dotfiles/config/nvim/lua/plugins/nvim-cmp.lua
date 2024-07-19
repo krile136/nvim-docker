@@ -1,3 +1,4 @@
+
 return {
   "hrsh7th/nvim-cmp",
   dependencies = {
@@ -6,7 +7,7 @@ return {
     "hrsh7th/cmp-path",
     "hrsh7th/cmp-nvim-lua",
     "L3MON4D3/LuaSnip",
-    "saadparwaiz1/cmp_luasnip"
+    "saadparwaiz1/cmp_luasnip",
   },
   config = function()
     local cmp = require('cmp')
@@ -44,6 +45,7 @@ return {
       Event = "",
       Operator = "",
       TypeParameter = "",
+      Copilot = ""
     }
 
     cmp.setup({
@@ -82,6 +84,7 @@ return {
                 end
 
                 -- 拡張子が snippetExtensions に存在しない場合に処理を行う
+                -- ()を後ろにつけて、そのカッコの中にカーソルを自動遷移
                 if not isSnippetExtension then
                   vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("()<Left>", true, true, true), "n", true)
                 end
@@ -112,20 +115,24 @@ return {
             buffer = "[Buffer]",
             path = "[Path]",
             nvim_lua = "[Lua]",
+            copilot = "[Copilot]"
           })[entry.source.name]
-
 
           return vim_item
         end,
       },
       sources = cmp.config.sources({
-        { name = 'nvim_lsp' },
-        { name = 'luasnip' },
-        { name = 'nvim_lua' },
+        { name = "copilot", group = 'copilot'},
+        { name = 'nvim_lsp', group = 'lsp'},
+        { name = 'luasnip', group = 'other' },
+        { name = 'nvim_lua', group = 'other'},
       }, {
         { name = 'buffer' },
         { name = 'path' },
       })
     })
+
+    -- copilotの色設定
+    vim.api.nvim_set_hl(0, "CmpItemKindCopilot", {fg ="#6CC644"})
   end
 }
