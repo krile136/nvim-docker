@@ -10,9 +10,23 @@ RUN apt update && \
 RUN add-apt-repository ppa:longsleep/golang-backports
 
 # ミドルウェアのインストール
+# curl  サーバーからデータを転送するためのツール trees-sitterのダウンロードに使用している
+# git   バージョン管理ツール
+# ripgrep  テキスト検索ツール(telescopeで使用)
+# tar   圧縮ファイルの解凍に使用
+# unzip 圧縮ファイルの解凍に使用
+# vim   ないと不便なエディタ
+# wget  ファイルのダウンロードに使用
+# build-essential  ビルドに必要なツール
+# nodejs  javascriptの実行環境
+# golang-go  golangの実行環境
+# npm   nodejsのパッケージ管理ツール
+# php-xml  phpのxmlパッケージ(phpのLSPで使用していたような？）
+# fd-find  ファイル検索ツール(telecopeでより早い検索に使用)
+# libunibilium-dev  なくてもneovimは動くが、色がおかしくなる
 RUN apt update && \
     apt-get update && \
-    apt install -y curl git ripgrep tar unzip vim wget build-essential nodejs golang-go npm php-xml fd-find
+    apt install -y curl git ripgrep tar unzip vim wget build-essential nodejs golang-go npm php-xml fd-find libunibilium-dev
 
 # （途中でlocation聞かれて -y だけでは突破できない）
 ENV DEBIAN_FRONTEND=noninteractive
@@ -40,6 +54,9 @@ RUN npm install n -g
 RUN n stable
 RUN apt purge -y nodejs npm
 RUN apt autoremove -y
+
+# prettierをインストールしておく
+RUN npm install --global prettier
 
 # composer install  php-cliとphp-mbstringを使っている（らしい）
 # インストールに失敗する場合は、hash値が違っている可能性が高いので公式を参考に修正する

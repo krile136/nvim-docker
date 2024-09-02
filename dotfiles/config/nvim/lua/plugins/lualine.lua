@@ -64,14 +64,5 @@ return {
       tabline = {},
       extensions = {},
     }
-
-
---    require('lualine').setup({
---      options = {
---        icons_enabled = true,
---        theme = 'vscode',
---        globalstatus = true,
---      },
---   })
   end
 }

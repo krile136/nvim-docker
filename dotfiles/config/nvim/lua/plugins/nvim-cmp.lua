@@ -121,14 +121,13 @@ return {
           return vim_item
         end,
       },
-      sources = cmp.config.sources({
-        { name = "copilot", group = 'copilot'},
-        { name = 'nvim_lsp', group = 'lsp'},
-        { name = 'luasnip', group = 'other' },
-        { name = 'nvim_lua', group = 'other'},
-      }, {
-        { name = 'buffer' },
-        { name = 'path' },
+       ources = cmp.config.sources({
+        { name = "copilot", group = 'all'},
+        { name = 'nvim_lsp', group = 'all'},
+        { name = 'luasnip', group = 'all' },
+        { name = 'nvim_lua', group = 'all'},
+        { name = 'buffer', group = 'all' },
+        { name = 'path', group = 'all' },
       })
     })
 

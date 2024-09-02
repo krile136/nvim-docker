@@ -1,5 +1,6 @@
 return {
   "lukas-reineke/indent-blankline.nvim",
+  event = 'VimEnter',  -- Neovimの起動が完了した後にロード
   main = "ibl",
   opts = {},
   config = function()
