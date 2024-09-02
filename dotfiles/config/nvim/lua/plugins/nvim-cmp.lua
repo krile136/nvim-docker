@@ -121,7 +121,7 @@ return {
           return vim_item
         end,
       },
-       ources = cmp.config.sources({
+      sources = cmp.config.sources({
         { name = "copilot", group = 'all'},
         { name = 'nvim_lsp', group = 'all'},
         { name = 'luasnip', group = 'all' },
