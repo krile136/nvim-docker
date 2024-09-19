@@ -1,5 +1,6 @@
 return {
   'mvllow/modes.nvim',
+  event = 'VimEnter',  -- Neovimの起動が完了した後にロード
 	tag = 'v0.2.0',
 	config = function()
 		require('modes').setup()

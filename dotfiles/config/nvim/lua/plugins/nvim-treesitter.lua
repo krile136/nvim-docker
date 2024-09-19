@@ -8,6 +8,8 @@ return {
         "php",
         "markdown",
         "markdown_inline",
+        "typescript",
+        "apex",
       },
       highlight = {
         enable = true,

@@ -10,16 +10,31 @@ RUN apt update && \
 RUN add-apt-repository ppa:longsleep/golang-backports
 
 # ミドルウェアのインストール
+# curl  サーバーからデータを転送するためのツール trees-sitterのダウンロードに使用している
+# git   バージョン管理ツール
+# ripgrep  テキスト検索ツール(telescopeで使用)
+# tar   圧縮ファイルの解凍に使用
+# unzip 圧縮ファイルの解凍に使用
+# vim   ないと不便なエディタ
+# wget  ファイルのダウンロードに使用
+# build-essential  ビルドに必要なツール
+# nodejs  javascriptの実行環境
+# golang-go  golangの実行環境
+# npm   nodejsのパッケージ管理ツール
+# php-xml  phpのxmlパッケージ(phpのLSPで使用していたような？）
+# fd-find  ファイル検索ツール(telecopeでより早い検索に使用)
+# libunibilium-dev  なくてもneovimは動くが、色がおかしくなる
+# openjdk-11-jd java11の実行環境(apexのformatterに必要)
 RUN apt update && \
     apt-get update && \
-    apt install -y curl git ripgrep tar unzip vim wget build-essential nodejs golang-go npm php-xml fd-find
+    apt install -y curl git ripgrep tar unzip vim wget build-essential nodejs golang-go npm php-xml fd-find libunibilium-dev openjdk-11-jdk
 
 # （途中でlocation聞かれて -y だけでは突破できない）
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt install php-cli php-mbstring -y
 
-# neovim v0.9.5 をインストール
-RUN wget https://github.com/neovim/neovim/releases/download/v0.9.5/nvim-linux64.tar.gz && \
+# neovim v0.10.1 をインストール
+RUN wget https://github.com/neovim/neovim/releases/download/v0.10.1/nvim-linux64.tar.gz && \
     tar -zxvf nvim-linux64.tar.gz && \
     mv nvim-linux64/bin/nvim usr/bin/nvim && \
     mv nvim-linux64/lib/nvim usr/lib/nvim && \
@@ -40,6 +55,9 @@ RUN npm install n -g
 RUN n stable
 RUN apt purge -y nodejs npm
 RUN apt autoremove -y
+
+# salesforceのformatterをインストール
+RUN npm install --global prettier prettier-plugin-apex
 
 # composer install  php-cliとphp-mbstringを使っている（らしい）
 # インストールに失敗する場合は、hash値が違っている可能性が高いので公式を参考に修正する

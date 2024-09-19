@@ -122,17 +122,14 @@ return {
         end,
       },
       sources = cmp.config.sources({
-        { name = "copilot", group = 'copilot'},
-        { name = 'nvim_lsp', group = 'lsp'},
-        { name = 'luasnip', group = 'other' },
-        { name = 'nvim_lua', group = 'other'},
-      }, {
-        { name = 'buffer' },
-        { name = 'path' },
+        { name = 'nvim_lsp', group = 'all'},
+        { name = 'buffer', group = 'all' },
+        { name = 'luasnip', group = 'all' },
+        { name = 'nvim_lua', group = 'all'},
+        { name = 'path', group = 'all' },
+        { name = "copilot", group = 'all'},
       })
     })
 
-    -- copilotの色設定
-    vim.api.nvim_set_hl(0, "CmpItemKindCopilot", {fg ="#6CC644"})
   end
 }

@@ -2,6 +2,7 @@ version: '3'
 services: 
     neovim:
         build: ./
+        platform: linux/x86_64
         container_name: neovim
         tty: true
         environment:
@@ -17,3 +18,5 @@ services:
             - ./cache:/root/.cache 
             # github copilotの認証情報を同期してコンテナを作り直すたびに再認証をしなくてよくする
             - ./github-copilot:/root/.config/github-copilot
+            # apexのLSPサーバーを移動する
+            - ./apex-jorje-lsp.jar:/root/.local/share/nvim/lsp_servers/apex-jorje-lsp.jar

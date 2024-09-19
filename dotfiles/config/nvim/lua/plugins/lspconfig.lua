@@ -12,14 +12,6 @@ return {
       }, bufnr)
     end
 
-    -- nvim_lsp['phpactor'].setup{
-    --     on_attach = custom_attach,
-    --     flags = {
-    --       debounce_text_changes = 150,
-    --       },
-    --     settings = {}
-    -- }
-    
     nvim_lsp['intelephense'].setup{
         on_attach = custom_attach,
         flags = {
@@ -56,6 +48,21 @@ return {
             debounce_text_changes = 150,
         }
     }
+
+    -- nvim_lsp['apex_ls'].setup{
+    --   cmd = { 'java', '-jar', '/root/.local/share/nvim/lsp_servers/apex-jorje-lsp.jar' },
+    --   filetypes = { 'apex' },
+    --   on_attach = custom_attach,
+    --   flags = {
+    --     debounce_text_changes = 150,
+    --   },
+    --   settings = {
+    --     apex = {
+    --       enable_semantic_errors = true,
+    --       enable_completion_statistics = true,
+    --     }
+    --   }
+    -- }
 
     -- keyboard shortcut
     -- ctrl + o で定義ジャンプ元に戻れる

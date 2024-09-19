@@ -16,6 +16,9 @@ return{
         width = 1, 
       },
       finder = {
+        max_height = 1,
+        left_width = 0.3,
+        right_width = 0.7,
       },
     })
     vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, { virtual_text = false })
