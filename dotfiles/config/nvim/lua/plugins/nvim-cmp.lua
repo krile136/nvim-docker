@@ -1,4 +1,3 @@
-
 return {
   "hrsh7th/nvim-cmp",
   dependencies = {
@@ -122,16 +121,14 @@ return {
         end,
       },
       sources = cmp.config.sources({
-        { name = "copilot", group = 'all'},
         { name = 'nvim_lsp', group = 'all'},
+        { name = 'buffer', group = 'all' },
         { name = 'luasnip', group = 'all' },
         { name = 'nvim_lua', group = 'all'},
-        { name = 'buffer', group = 'all' },
         { name = 'path', group = 'all' },
+         -- { name = "copilot", group = 'all'},
       })
     })
 
-    -- copilotの色設定
-    vim.api.nvim_set_hl(0, "CmpItemKindCopilot", {fg ="#6CC644"})
   end
 }
