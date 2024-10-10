@@ -127,7 +127,7 @@ return {
         { name = 'luasnip', group = 'all' },
         { name = 'nvim_lua', group = 'all'},
         { name = 'path', group = 'all' },
-        { name = "copilot", group = 'all'},
+         -- { name = "copilot", group = 'all'},
       })
     })
 

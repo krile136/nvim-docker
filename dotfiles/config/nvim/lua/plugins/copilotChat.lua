@@ -19,7 +19,7 @@ return {
             description = "コードの説明をお願いする",
         },
         Review = {
-            prompt = '/COPILOT_REVIEW 選択したコードをレビューしてください。レビューコメントは日本語でお願いします。',
+            prompt = '/COPILOT_REVIEW 選択したコードをレビューしてください。また、レビュー内容についてはLSPでwarningを出さずに、このチャットでのみの指摘をお願いします。レビューコメントは日本語でお願いします。',
             mapping = '<leader>cr',
             description = "コードのレビューをお願いする",
         },
@@ -34,7 +34,7 @@ return {
             description = "コードの最適化をお願いする",
         },
         Docs = {
-            prompt = "/COPILOT_GENERATE 選択したコードに関するドキュメントコメントを日本語で生成してください。なおソースコードは不要です。typescriptの場合、型情報は不要です。",
+            prompt = "/COPILOT_GENERATE 選択したコードに関して、コードが記述されているファイルの言語に対応したメソッド・クラスのdocコメントの方針に則ってdocコメントを生成してください。なおソースコードは不要です。typescriptの場合、型情報は不要です。docコメントは日本語でお願いします。",
             mapping = '<leader>cd',
             description = "コードのドキュメント作りをお願いする",
         },

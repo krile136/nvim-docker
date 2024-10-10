@@ -40,7 +40,7 @@ return {
 
     local function lsp_clients()
       local clients = vim.lsp.get_active_clients({ bufnr = 0 })
-      local noClients = "%#LspIcon#%#LspText#  LSPなし"
+      local noClients = "%#LspIcon#%#LspText#  no LSP clinet"
       if next(clients) == nil then
         return noClients 
       end
@@ -56,7 +56,7 @@ return {
     end
 
     local function current_time()
-      return "%#TimeIcon#%#TimeText# " .. os.date("%H:%M:%S")  -- 時:分の形式で現在時刻を取得
+      return "%#TimeIcon#%#TimeText# " .. os.date("%H:%M:%S")
     end
 
     require('lualine').setup {
@@ -71,6 +71,28 @@ return {
         lualine_c = { 'diagnostics' },
         lualine_x = { 'diff' },
         lualine_y = { 
+          {'copilot',
+            symbols = {
+                status = {
+                    icons = {
+                        enabled = " ",
+                        sleep = " ",   -- auto-trigger disabled
+                        disabled = " ",
+                        warning = " ",
+                        unknown = " "
+                    },
+                    hl = {
+                        enabled = "#50FA7B",
+                        sleep = "#50FA7B",
+                        disabled = "#6272A4",
+                        warning = "#FFB86C",
+                        unknown = "#FF5555"
+                    }
+                },
+                spinners = require("copilot-lualine.spinners").dots,
+                spinner_color = "#EE7800"
+            },
+            show_colors = true},
           {'filetype'},
           {lsp_clients, color = {fg = colors.white, bg = colors.grey} },
           {current_time, color = {fg = colors.white, bg = colors.grey} },

@@ -16,6 +16,8 @@ services:
             - ./mason:/root/.local/share/nvim/mason 
             # nvimやLSPのキャッシュ　立ち上げるたびにindex作り直すので永続化
             - ./cache:/root/.cache 
+            # treesitterのパーサー 立ち上げる度に消えるので永続化
+            - ./parser:/root/.local/share/nvim/lazy/nvim-treesitter/parser
             # github copilotの認証情報を同期してコンテナを作り直すたびに再認証をしなくてよくする
             - ./github-copilot:/root/.config/github-copilot
             # apexのLSPサーバーを移動する

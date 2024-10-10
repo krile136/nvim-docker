@@ -10,6 +10,7 @@ return {
         "markdown_inline",
         "typescript",
         "apex",
+        "html",
       },
       highlight = {
         enable = true,
