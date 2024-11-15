@@ -6,6 +6,8 @@ return {
     "zbirenbaum/copilot-cmp",
   },
   config = function()
+    -- Escキーを送信するマッピングを作成(Copilotのリセット用)
+    vim.api.nvim_set_keymap('i', '<C-c>', '<Esc>', { noremap = true, silent = true })
     require("copilot").setup({
       panel = {
         enabled = false,    -- copilot-cmpを使うためpanelは使わない

@@ -20,7 +20,6 @@ require("lazy").setup({
   require('plugins/copilotChat'),
   require('plugins/copilot-lualine'),
   require('plugins/fidget'),
-  require('plugins/hlargs'),
   require('plugins/lsp-signature'),
   require('plugins/lspconfig'),
   require('plugins/lspsaga'),
@@ -32,18 +31,21 @@ require("lazy").setup({
   require('plugins/none-ls'),
   require('plugins/nvim-cmp'),
   require('plugins/nvim-scrollbar'),
-  require('plugins/nvim-tree'),
   require('plugins/nvim-treesitter'),
   require('plugins/smart-open'),
   require('plugins/telescope'),
   require('plugins/vscode'),
   require('plugins/render-markdown');
   require('plugins/nvim-colorizer'),
+  require('plugins/oil'),
+  require('plugins/oil-git-status'),
+  require('plugins/git-blame'),
 
   -- 後で読み込むことで正常に動くようになる
   require('plugins/modes'),
   require('plugins/indent-blankline'),
  
+  require('plugins/hlargs'),
 }, lazyOpts)
 
 --------------------- NvimTreeの色設定 ---------------------
@@ -58,6 +60,8 @@ vim.cmd [[
 -- Define highlight groups for icons
 vim.cmd('highlight LspIcon guifg=#99FF99 guibg=#303030')
 vim.cmd('highlight TimeIcon guifg=#99FFFF guibg=#303030')
+vim.cmd('highlight GitIcon guifg=#F58220 guibg=#303030')
+vim.cmd('highlight EncodingIcon guifg=#ba82e3 guibg=#303030')
 
 -- Define colors for each heading level
 vim.cmd('highlight RenderMarkdownH1Bg guibg=#FFCCCC')
@@ -75,8 +79,6 @@ vim.cmd('highlight link RenderMarkdownH4 RenderMarkdownH4Bg')
 vim.cmd('highlight link RenderMarkdownH5 RenderMarkdownH5Bg')
 vim.cmd('highlight link RenderMarkdownH6 RenderMarkdownH6Bg')
 
--- Escキーを送信するマッピングを作成(Copilotのリセット用)
-vim.api.nvim_set_keymap('i', '<C-c>', '<Esc>', { noremap = true, silent = true })
 
 -- 特定の拡張子を別の拡張子として扱う
 vim.filetype.add({
