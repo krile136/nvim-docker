@@ -9,5 +9,5 @@ return {
     hint_prefix = "👈 ",
     hint_enable = false,
   },
-  config = function(_, opts) require'lsp_signature'.setup(opts) end
+  config = function(_, opts) require 'lsp_signature'.setup(opts) end
 }

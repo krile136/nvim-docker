@@ -5,7 +5,7 @@ return {
     local null_ls = require('null-ls')
     local sources = {
       null_ls.builtins.formatting.prettier.with({
-        filetypes = { "apex" }, -- Apexファイルに対してprettierを使用
+        filetypes = { "apex" },                  -- Apexファイルに対してprettierを使用
         extra_args = { "--print-width", "150" }, -- 追加のオプション
       }),
       null_ls.builtins.formatting.prettier.with({
@@ -18,6 +18,7 @@ return {
     })
 
     -- フォーマット用のキーバインドを設定
-    vim.api.nvim_set_keymap('n', '<Leader>ff', '<cmd>lua vim.lsp.buf.format({ async = true })<CR>', { noremap = true, silent = true })
+    vim.api.nvim_set_keymap('n', '<Leader>ff', '<cmd>lua vim.lsp.buf.format({ async = true })<CR>',
+      { noremap = true, silent = true })
   end,
 }

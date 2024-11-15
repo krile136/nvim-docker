@@ -6,6 +6,6 @@ return {
   },
 
   config = function()
-      require("oil-git-status").setup()
+    require("oil-git-status").setup()
   end,
 }

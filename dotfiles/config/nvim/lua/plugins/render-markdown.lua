@@ -1,4 +1,4 @@
 return {
-    'MeanderingProgrammer/render-markdown.nvim',
-    opts = {},
+  'MeanderingProgrammer/render-markdown.nvim',
+  opts = {},
 }

@@ -1,3 +1,4 @@
+_G.vim = vim
 --------------------- basic settings ---------------------
 require('settings/basic')
 
@@ -7,12 +8,12 @@ require('settings/keymap')
 --------------------- plugins ---------------------
 require('settings/pluginSetup')
 
-vim.o.termguicolors = true  -- nvim-colorizerのためにプラグインを読み込む前に設定する
+vim.o.termguicolors = true -- nvim-colorizerのためにプラグインを読み込む前に設定する
 
 local lazyOpts = {
- 	ui = {
-	  border = "rounded",
-	},
+  ui = {
+    border = "rounded",
+  },
 }
 require("lazy").setup({
   require('plugins/comment'),
@@ -35,7 +36,7 @@ require("lazy").setup({
   require('plugins/smart-open'),
   require('plugins/telescope'),
   require('plugins/vscode'),
-  require('plugins/render-markdown');
+  require('plugins/render-markdown'),
   require('plugins/nvim-colorizer'),
   require('plugins/oil'),
   require('plugins/oil-git-status'),
@@ -44,7 +45,7 @@ require("lazy").setup({
   -- 後で読み込むことで正常に動くようになる
   require('plugins/modes'),
   require('plugins/indent-blankline'),
- 
+
   require('plugins/hlargs'),
 }, lazyOpts)
 
@@ -61,7 +62,13 @@ vim.cmd [[
 vim.cmd('highlight LspIcon guifg=#99FF99 guibg=#303030')
 vim.cmd('highlight TimeIcon guifg=#99FFFF guibg=#303030')
 vim.cmd('highlight GitIcon guifg=#F58220 guibg=#303030')
+vim.cmd('highlight GitAlertIcon guifg=#FFFF00 guibg=#303030')
 vim.cmd('highlight EncodingIcon guifg=#ba82e3 guibg=#303030')
+vim.cmd('highlight BatteryNoneIcon guifg=#8B0000 guibg=#303030')
+vim.cmd('highlight BatteryDangerIcon guifg=#8B0000 guibg=#303030')
+vim.cmd('highlight BatteryWarningIcon guifg=#BBBB44 guibg=#303030')
+vim.cmd('highlight BatteryGoodIcon guifg=#66AACC guibg=#303030')
+vim.cmd('highlight BatteryFullIcon guifg=#3BAF75 guibg=#303030')
 
 -- Define colors for each heading level
 vim.cmd('highlight RenderMarkdownH1Bg guibg=#FFCCCC')
@@ -100,4 +107,4 @@ vim.g.clipboard = {
     ['+'] = require('vim.ui.clipboard.osc52').paste('+'),
     ['*'] = require('vim.ui.clipboard.osc52').paste('*'),
   },
- }
+}

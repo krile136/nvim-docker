@@ -19,3 +19,7 @@ services:
             - ./parser:/root/.local/share/nvim/lazy/nvim-treesitter/parser
             # github copilotの認証情報を同期してコンテナを作り直すたびに再認証をしなくてよくする
             - ./github-copilot:/root/.config/github-copilot
+            # ホストOSで取得したバッテリー状況を共有する 
+            - ./batteryStatus.txt:/root/batteryStatus.txt
+            # READMEをコンテナ内でも編集できるように
+            - ./README.md:/root/README.md

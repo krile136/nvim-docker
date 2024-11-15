@@ -1,22 +1,21 @@
 return {
   'nvim-lualine/lualine.nvim',
   config = function()
--- Bubbles config for lualine
--- Author: lokesh-krishna
--- MIT license, see LICENSE for more details.
+    -- Bubbles config for lualine
+    -- Author: lokesh-krishna
+    -- MIT license, see LICENSE for more details.
 
--- stylua: ignore
+    -- stylua: ignore
     local colors = {
-      blue   = '#80a0ff',
-      cyan   = '#79dac8',
-      black  = '#080808',
-      white  = '#c6c6c6',
-      red    = '#ff5189',
-      violet = '#d183e8',
-      grey   = '#303030',
+      blue     = '#80a0ff',
+      cyan     = '#79dac8',
+      black    = '#080808',
+      white    = '#c6c6c6',
+      red      = '#ff5189',
+      violet   = '#d183e8',
+      grey     = '#303030',
       darkGrey = '#7d7d7d'
     }
-
 
     local bubbles_theme = {
       normal = {
@@ -30,8 +29,8 @@ return {
 
       insert = { a = { fg = colors.black, bg = colors.blue }, z = { fg = colors.black, bg = colors.blue } },
       visual = { a = { fg = colors.black, bg = colors.cyan }, z = { fg = colors.black, bg = colors.cyan } },
-      replace = { a = { fg = colors.black, bg = colors.red }, z = { fg = colors.black, bg = colors.red }  },
-  
+      replace = { a = { fg = colors.black, bg = colors.red }, z = { fg = colors.black, bg = colors.red } },
+
       inactive = {
         a = { fg = colors.white, bg = colors.black },
         b = { fg = colors.white, bg = colors.black },
@@ -44,7 +43,7 @@ return {
       local clients = vim.lsp.get_active_clients({ bufnr = 0 })
       local noClients = "%#LspIcon#%#LspText#  no LSP clinet"
       if next(clients) == nil then
-        return noClients 
+        return noClients
       end
       local client_names = {}
       for _, client in pairs(clients) do
@@ -52,7 +51,7 @@ return {
           table.insert(client_names, client.name)
         end
       end
-      
+
       if next(client_names) == nil then return noClients end
       return "%#LspIcon#%#LspText#  " .. table.concat(client_names, ", ")
     end
@@ -70,17 +69,17 @@ return {
     local last_check_time = 0
     local cache_duration = 5000 -- キャッシュの有効期間（ミリ秒）
     local function branch_with_icon()
-      local current_time = vim.loop.now()
+      local now = vim.loop.now()
 
-      if not cached_branch or (current_time - last_check_time > cache_duration) then
+      if not cached_branch or (now - last_check_time > cache_duration) then
         cached_branch = vim.fn.system('git branch --show-current'):gsub('%s+', '')
-        last_check_time = current_time
+        last_check_time = now
       end
 
       if cached_branch:find('fatal') then
         return '%#GitIcon#?%#GitText# Branch not found'
       elseif cached_branch == 'main' or cached_branch == 'master' then
-        return '⚠️   ' .. cached_branch
+        return '%#GitAlertIcon#%#GitText#  ' .. cached_branch
       else
         return '%#GitIcon#%#GitText# ' .. cached_branch
       end
@@ -95,53 +94,89 @@ return {
       return '%#EncodingIcon# %#EncodingText# ' .. encoding
     end
 
+    -- バッテリーの残量を表示する
+    local cached_battery_level = "N/A"
+    local last_battery_check_time = 0
+    local battery_cache_duration = 60000 -- キャッシュの有効期間（ミリ秒）
+    local function battery_status()
+      local now = vim.loop.now()
+      if not cached_battery_level or (now - last_battery_check_time > battery_cache_duration) then
+        local file, err = io.open("/root/batteryStatus.txt", "r")
+        if file then
+          cached_battery_level = file:read("*all"):gsub("%s+", "")
+          file:close()
+        else
+          print("Error reading battery status: " .. err)
+          cached_battery_level = "N/A"
+        end
+        last_battery_check_time = now
+      end
 
+      local battery_message = "%#"
+      if (cached_battery_level == "N/A") then
+        battery_message = battery_message .. "BatteryNoneIcon#󰂑%#BatteryText# "
+      else
+        local battery_number = tonumber(cached_battery_level)
+        if (battery_number < 20) then
+          battery_message = battery_message .. "BatteryDangerIcon#󱊡"
+        elseif (battery_number < 50) then
+          battery_message = battery_message .. "BatteryWarningIcon#󱊢"
+        elseif (battery_number < 99) then
+          battery_message = battery_message .. "BatteryGoodIcon#󱊣"
+        else
+          battery_message = battery_message .. "BatteryFullIcon#󰂄"
+        end
+        battery_message = battery_message .. "%#BatteryText# " .. cached_battery_level .. "%%"
+      end
 
+      return battery_message
+    end
     require('lualine').setup {
       options = {
         theme = bubbles_theme,
         component_separators = '|',
       },
-  
+
       sections = {
         lualine_a = { 'mode' },
         lualine_b = {},
-        lualine_c = { {'filename', path = 1}},
+        lualine_c = { { 'filename', path = 1 } },
         lualine_x = { 'diagnostics', 'diff' },
-        lualine_y = { 
-          {'filetype'},
-          {lsp_clients, color = {fg = colors.white, bg = colors.grey} },
-          {branch_with_icon, color = {fg = colors.white, bg = colors.grey}},
-          {encoding_with_icon, color = {fg = colors.white, bg = colors.grey}},
-          {current_time, color = {fg = colors.white, bg = colors.grey} },
-          {'copilot',
+        lualine_y = {
+          { 'filetype' },
+          { lsp_clients,        color = { fg = colors.white, bg = colors.grey } },
+          { branch_with_icon,   color = { fg = colors.white, bg = colors.grey } },
+          { encoding_with_icon, color = { fg = colors.white, bg = colors.grey } },
+          { current_time,       color = { fg = colors.white, bg = colors.grey } },
+          { battery_status,     color = { fg = colors.white, bg = colors.grey } },
+          { 'copilot',
             symbols = {
-                status = {
-                    icons = {
-                        enabled = " ",
-                        sleep = " ",   -- auto-trigger disabled
-                        disabled = " ",
-                        warning = " ",
-                        unknown = " "
-                    },
-                    hl = {
-                        enabled = "#50FA7B",
-                        sleep = "#50FA7B",
-                        disabled = "#6272A4",
-                        warning = "#FFB86C",
-                        unknown = "#FF5555"
-                    }
+              status = {
+                icons = {
+                  enabled = " ",
+                  sleep = " ", -- auto-trigger disabled
+                  disabled = " ",
+                  warning = " ",
+                  unknown = " "
                 },
-                spinners = require("copilot-lualine.spinners").dots,
-                spinner_color = "#EE7800"
+                hl = {
+                  enabled = "#50FA7B",
+                  sleep = "#50FA7B",
+                  disabled = "#6272A4",
+                  warning = "#FFB86C",
+                  unknown = "#FF5555"
+                }
+              },
+              spinners = require("copilot-lualine.spinners").dots,
+              spinner_color = "#EE7800"
             },
-            show_colors = true},
+            show_colors = true },
         },
-        lualine_z = { 
+        lualine_z = {
           'location'
-        } 
+        }
       },
-  
+
       inactive_sections = {
         lualine_a = {},
         lualine_b = {},

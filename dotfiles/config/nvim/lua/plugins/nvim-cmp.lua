@@ -54,8 +54,8 @@ return {
         end,
       },
       window = {
-         completion = cmp.config.window.bordered(),
-         documentation = cmp.config.window.bordered(),
+        completion = cmp.config.window.bordered(),
+        documentation = cmp.config.window.bordered(),
       },
       mapping = cmp.mapping.preset.insert({
         ['<C-j>'] = cmp.mapping.select_next_item(),
@@ -69,7 +69,7 @@ return {
               -- LSPソースの場合、メソッド名の後ろに()を追加
               local completion_item = entry:get_completion_item()
               local kind = completion_item.kind
-              if kind == 2 or kind == 3 then  -- 2: Method, 3: Function
+              if kind == 2 or kind == 3 then -- 2: Method, 3: Function
                 cmp.confirm({ select = true })
 
                 -- ファイルの拡張子がsnippetを補完に使用するか確認
@@ -101,7 +101,7 @@ return {
       formatting = {
         format = function(entry, vim_item)
           -- 関数の場合、括弧を追加する
-          if vim.tbl_contains({'Function', 'Method'}, vim_item.kind) then
+          if vim.tbl_contains({ 'Function', 'Method' }, vim_item.kind) then
             vim_item.abbr = vim_item.abbr .. '()'
           end
 
@@ -121,14 +121,13 @@ return {
         end,
       },
       sources = cmp.config.sources({
-        { name = 'nvim_lsp', group = 'all'},
-        { name = 'buffer', group = 'all' },
-        { name = 'luasnip', group = 'all' },
-        { name = 'nvim_lua', group = 'all'},
-        { name = 'path', group = 'all' },
-         -- { name = "copilot", group = 'all'},
+        { name = 'nvim_lsp', group = 'all' },
+        { name = 'buffer',   group = 'all' },
+        { name = 'luasnip',  group = 'all' },
+        { name = 'nvim_lua', group = 'all' },
+        { name = 'path',     group = 'all' },
+        -- { name = "copilot", group = 'all'},
       })
     })
-
   end
 }

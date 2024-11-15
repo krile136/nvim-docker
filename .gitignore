@@ -2,3 +2,6 @@
 /cache
 /github-copilot
 /parser
+/batteryStatus.log
+/batteryStatus.txt
+/getBatteryStatus.sh

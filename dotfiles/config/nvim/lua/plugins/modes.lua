@@ -1,9 +1,9 @@
 return {
   'mvllow/modes.nvim',
-  event = 'VimEnter',  -- Neovimの起動が完了した後にロード
-	tag = 'v0.2.0',
-	config = function()
-		require('modes').setup()
+  event = 'VimEnter', -- Neovimの起動が完了した後にロード
+  tag = 'v0.2.0',
+  config = function()
+    require('modes').setup()
 
     -- ecsでノーマルモードに戻った時は正常に戻るが、
     -- control + s でノーマルモードに戻った時に反応しないので
@@ -21,10 +21,9 @@ return {
     vim.api.nvim_create_autocmd('CursorMoved', {
       callback = function()
         if vim.fn.mode() == 'n' then
-        	require('modes').highlight('default')
+          require('modes').highlight('default')
         end
       end,
     })
-
-	end
+  end
 }
