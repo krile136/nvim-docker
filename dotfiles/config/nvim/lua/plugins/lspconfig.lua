@@ -39,7 +39,7 @@ return {
       settings = {}
     }
 
-    nvim_lsp['tsserver'].setup {
+    nvim_lsp['ts_ls'].setup {
       on_attach = custom_attach,
       on_init = function(client, _)
         client.server_capabilities.semanticTokensProvider = nil

@@ -1,11 +1,13 @@
 return {
   'karb94/neoscroll.nvim',
   config = function()
-    require('neoscroll').setup()
-
-    local t = {}
-    t['<C-u>'] = { 'scroll', { '-vim.wo.scroll', 'true', '50' } }
-    t['<C-d>'] = { 'scroll', { 'vim.wo.scroll', 'true', '50' } }
-    require('neoscroll.config').set_mappings(t)
+    local keymap = {
+      ["<C-u>"] = function() require('neoscroll').ctrl_u({ duration = 250 }) end,
+      ["<C-d>"] = function() require('neoscroll').ctrl_d({ duration = 250 }) end,
+    }
+    local modes = { 'n', 'v', 'x' }
+    for key, func in pairs(keymap) do
+      vim.keymap.set(modes, key, func)
+    end
   end
 }

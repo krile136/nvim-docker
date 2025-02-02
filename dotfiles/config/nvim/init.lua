@@ -56,20 +56,6 @@ vim.cmd [[
   highlight FloatBorder guibg=NONE
 ]]
 
--- Define highlight groups for icons
-vim.cmd('highlight LspIcon guifg=#99FF99 guibg=#303030')
-vim.cmd('highlight TimeIcon guifg=#99FFFF guibg=#303030')
-vim.cmd('highlight GitAlertIcon guifg=#FFFF00 guibg=#303030')
-vim.cmd('highlight GitIcon guifg=#F58220 guibg=#303030')
-vim.cmd('highlight EncodingIcon guifg=#ba82e3 guibg=#303030')
-vim.cmd('highlight BatteryChargingIcon guifg=#FFFF00 guibg=#303030')
-vim.cmd('highlight BatteryNoneIcon guifg=#8B0000 guibg=#303030')
-vim.cmd('highlight BatteryDangerIcon guifg=#8B0000 guibg=#303030')
-vim.cmd('highlight BatteryWarningIcon guifg=#BBBB44 guibg=#303030')
-vim.cmd('highlight BatteryGoodIcon guifg=#66AACC guibg=#303030')
-vim.cmd('highlight BatteryFullIcon guifg=#3BAF75 guibg=#303030')
-vim.cmd('highlight StatusText guifg=#C5C5C5 guibg=#303030')
-
 -- Define colors for each heading level
 vim.cmd('highlight RenderMarkdownH1Bg guibg=#FFCCCC')
 vim.cmd('highlight RenderMarkdownH2Bg guibg=#FFDDCC')
@@ -114,3 +100,17 @@ vim.g.clipboard = {
 require('settings/semantic-highlighting')
 require('settings/specific-word-highlighting')
 
+
+-- Define highlight groups for icons
+vim.cmd('highlight LspIcon guifg=#99FF99 guibg=#303030')
+vim.cmd('highlight TimeIcon guifg=#99FFFF guibg=#303030')
+vim.cmd('highlight GitAlertIcon guifg=#FFFF00 guibg=#303030')
+vim.cmd('highlight GitIcon guifg=#F58220 guibg=#303030')
+vim.cmd('highlight EncodingIcon guifg=#ba82e3 guibg=#303030')
+vim.cmd('highlight BatteryChargingIcon guifg=#FFFF00 guibg=#303030')
+vim.cmd('highlight BatteryNoneIcon guifg=#8B0000 guibg=#303030')
+vim.cmd('highlight BatteryDangerIcon guifg=#8B0000 guibg=#303030')
+vim.cmd('highlight BatteryWarningIcon guifg=#BBBB44 guibg=#303030')
+vim.cmd('highlight BatteryGoodIcon guifg=#66AACC guibg=#303030')
+vim.cmd('highlight BatteryFullIcon guifg=#3BAF75 guibg=#303030')
+vim.cmd('highlight StatusText guifg=#C5C5C5 guibg=#303030')

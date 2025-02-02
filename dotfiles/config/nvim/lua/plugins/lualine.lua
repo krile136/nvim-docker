@@ -42,7 +42,7 @@ return {
     -- LSPクライアントを表示する
     local function lsp_clients()
       local clients = vim.lsp.get_active_clients({ bufnr = 0 })
-      local noClients = "%#LspIcon#%#StatusText#  no LSP clinet"
+      local noClients = "%#LspIcon# %#StatusText# no LSP clinet"
       if next(clients) == nil then
         return noClients
       end
@@ -54,7 +54,8 @@ return {
       end
 
       if next(client_names) == nil then return noClients end
-      return "%#LspIcon#%#StatusText#  " .. table.concat(client_names, ", ")
+      -- return "%#TimeIcon#%#StatusText#  " .. table.concat(client_names, ", ")
+      return "%#LspIcon# %#StatusText# " .. table.concat(client_names, ", ")
     end
 
     -- 現在時刻をアイコンと一緒に表示する

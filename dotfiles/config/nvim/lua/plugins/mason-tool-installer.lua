@@ -7,8 +7,8 @@ return {
         'volar',        -- vue(typescript)のLSP
         'phpcbf',       -- PHPのフォーマッタ phpactorではフォーマットできないため
         'intelephense', -- PHPのLSP
-        'tsserver',
         'lua_ls',
+        'ts_ls',
       },
     }
   end
