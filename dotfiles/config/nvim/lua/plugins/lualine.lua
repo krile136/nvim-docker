@@ -1,3 +1,4 @@
+
 return {
   'nvim-lualine/lualine.nvim',
   config = function()
@@ -21,7 +22,7 @@ return {
       normal = {
         a = { fg = colors.black, bg = colors.violet },
         b = { fg = colors.white, bg = colors.grey },
-        c = { fg = colors.darkGrey, bg = colors.black },
+        c = { fg = colors.whitey, bg = colors.black },
         x = { fg = colors.white, bg = colors.black },
         y = { fg = colors.white, bg = colors.grey },
         z = { fg = colors.black, bg = colors.violet },
@@ -41,24 +42,24 @@ return {
     -- LSPクライアントを表示する
     local function lsp_clients()
       local clients = vim.lsp.get_active_clients({ bufnr = 0 })
-      local noClients = "%#LspIcon#%#LspText#  no LSP clinet"
+      local noClients = "%#LspIcon#%#StatusText#  no LSP clinet"
       if next(clients) == nil then
         return noClients
       end
       local client_names = {}
       for _, client in pairs(clients) do
-        if client.name ~= "copilot" then
+        if client.name ~= "copilot" and client.name ~= "null-ls" then
           table.insert(client_names, client.name)
         end
       end
 
       if next(client_names) == nil then return noClients end
-      return "%#LspIcon#%#LspText#  " .. table.concat(client_names, ", ")
+      return "%#LspIcon#%#StatusText#  " .. table.concat(client_names, ", ")
     end
 
     -- 現在時刻をアイコンと一緒に表示する
     local function current_time()
-      return "%#TimeIcon# %#TimeText# " .. os.date("%H:%M:%S")
+      return "%#TimeIcon# %#StatusText# " .. os.date("%H:%M:%S")
     end
 
 
@@ -72,16 +73,16 @@ return {
       local now = vim.loop.now()
 
       if not cached_branch or (now - last_check_time > cache_duration) then
-        cached_branch = vim.fn.system('git branch --show-current'):gsub('%s+', '')
+        cached_branch = vim.fn.system('git rev-parse --abbrev-ref HEAD'):gsub('%s+', '')
         last_check_time = now
       end
 
       if cached_branch:find('fatal') then
-        return '%#GitIcon#?%#GitText# Branch not found'
+        return '%#GitIcon#?%#StatusText# Branch not found'
       elseif cached_branch == 'main' or cached_branch == 'master' then
-        return '%#GitAlertIcon#%#GitText#  ' .. cached_branch
+        return '%#GitAlertIcon#%#StatusText#  ' .. cached_branch
       else
-        return '%#GitIcon#%#GitText# ' .. cached_branch
+        return '%#GitIcon#%#StatusText# ' .. cached_branch
       end
     end
 
@@ -91,32 +92,38 @@ return {
       if encoding == '' then
         encoding = vim.o.encoding
       end
-      return '%#EncodingIcon# %#EncodingText# ' .. encoding
+      return '%#EncodingIcon# %#StatusText# ' .. encoding
     end
 
     -- バッテリーの残量を表示する
-    local cached_battery_level = "N/A"
+    local cached_battery_status = "N/A"
     local last_battery_check_time = 0
-    local battery_cache_duration = 60000 -- キャッシュの有効期間（ミリ秒）
+    local battery_cache_duration = 20000 -- キャッシュの有効期間（ミリ秒）
     local function battery_status()
       local now = vim.loop.now()
-      if not cached_battery_level or (now - last_battery_check_time > battery_cache_duration) then
+      if not cached_battery_status or (now - last_battery_check_time > battery_cache_duration) then
         local file, err = io.open("/root/batteryStatus.txt", "r")
         if file then
-          cached_battery_level = file:read("*all"):gsub("%s+", "")
+          cached_battery_status = file:read("*all"):gsub("%s+", "")
           file:close()
         else
           print("Error reading battery status: " .. err)
-          cached_battery_level = "N/A"
+          cached_battery_status = "N/A"
         end
         last_battery_check_time = now
       end
 
       local battery_message = "%#"
-      if (cached_battery_level == "N/A") then
-        battery_message = battery_message .. "BatteryNoneIcon#󰂑%#BatteryText# "
+      if (cached_battery_status == "N/A") then
+        battery_message = battery_message .. "BatteryNoneIcon#󰂑%#StatusText# "
       else
-        local battery_number = tonumber(cached_battery_level)
+        -- Split the cached_battery_status by comma
+        local battery_level, battery_resource = cached_battery_status:match("([^,]+),%s*(.+)")
+        -- print("battery resource: " .. battery_resource)
+        if string.find(battery_resource, "AC") then
+          battery_message = battery_message .. "BatteryChargingIcon#󰚥 %#"
+        end
+        local battery_number = tonumber(battery_level)
         if (battery_number < 20) then
           battery_message = battery_message .. "BatteryDangerIcon#󱊡"
         elseif (battery_number < 50) then
@@ -124,13 +131,14 @@ return {
         elseif (battery_number < 99) then
           battery_message = battery_message .. "BatteryGoodIcon#󱊣"
         else
-          battery_message = battery_message .. "BatteryFullIcon#󰂄"
+          battery_message = battery_message .. "BatteryFullIcon#󱊣"
         end
-        battery_message = battery_message .. "%#BatteryText# " .. cached_battery_level .. "%%"
+        battery_message = battery_message .. "%#StatusText# " .. battery_level .. "%%"
       end
 
       return battery_message
     end
+
     require('lualine').setup {
       options = {
         theme = bubbles_theme,
@@ -140,15 +148,17 @@ return {
       sections = {
         lualine_a = { 'mode' },
         lualine_b = {},
-        lualine_c = { { 'filename', path = 1 } },
+        lualine_c = { 
+          { 'filename', path = 1 }, 
+        },
         lualine_x = { 'diagnostics', 'diff' },
         lualine_y = {
           { 'filetype' },
           { lsp_clients,        color = { fg = colors.white, bg = colors.grey } },
           { branch_with_icon,   color = { fg = colors.white, bg = colors.grey } },
           { encoding_with_icon, color = { fg = colors.white, bg = colors.grey } },
-          { current_time,       color = { fg = colors.white, bg = colors.grey } },
           { battery_status,     color = { fg = colors.white, bg = colors.grey } },
+          { current_time,       color = { fg = colors.white, bg = colors.grey } },
           { 'copilot',
             symbols = {
               status = {
@@ -190,3 +200,5 @@ return {
     }
   end
 }
+
+

@@ -1,15 +1,11 @@
-local ts_utils = require 'nvim-treesitter.ts_utils'
-
 -- 色のリスト
 local colors = {
   { fg = "#ef9062" },
-  { fg = "#3AC6BE" },
   { fg = "#35D27F" },
   { fg = "#EB75D6" },
   { fg = "#E5D180" },
   { fg = "#8997F5" },
   { fg = "#D49DA5" },
-  { fg = "#7FEC35" },
   { fg = "#F6B223" },
   { fg = "#F67C1B" },
   { fg = "#BBEA87" },
@@ -18,6 +14,9 @@ local colors = {
   { fg = "#F7CAC9" },
   { fg = "#C3447A" },
 }
+
+-- 初期化を走らせたくないファイルタイプを管理するテーブル
+local ignore_initialize_filetypes = { "TelescopePrompt", "oil" }
 
 -- 無視する変数名を管理するテーブル
 local ignore_variables = {}
@@ -30,40 +29,89 @@ local color_index = 1
 local namespace_id = vim.api.nvim_create_namespace("VariableColorNamespace")
 
 -- ファイルタイプごとのクエリを定義するテーブル
+-- variable_queryだけで頑張ろうとするとネストが深いものなど取りこぼしがあるかもしれないので
+-- variable_queryで広く取りつつ、ignore_queryで無視するノードを細かく指定する
+-- それでも色がついてしまうnodeについてはignore_special_conditionsでさらに細かく無視する条件を指定する
 local queries = {
   apex = {
     ignore_query = [[
-      (method_declaration name: (identifier) @function.method)
     ]],
+    ignore_special_conditions = function(node)
+      local var_name = vim.treesitter.get_node_text(node, 0)
+      -- var_nameの先頭が大文字かどうかを判定
+      if var_name:sub(1, 1):match("%u") then
+        return true
+      end
+      return false
+    end,
     variable_query = [[
-      (identifier) @variable
-    ]]
+    ]],
   },
   go = {
     ignore_query = "",
+    ignore_special_conditions = function(node)
+      return false;
+    end,
     variable_query = [[
       (identifier) @variable
-    ]]
+    ]],
   },
   php = {
     ignore_query = "",
+    ignore_special_conditions = function(node)
+      return false;
+    end,
     variable_query = [[
       (variable_name (name) @variable)
+      (member_access_expression (name) @variable)
     ]]
   },
   typescript = {
     ignore_query = [[
       (function_declaration name: (identifier) @function.name)
     ]],
+    ignore_special_conditions = function(node)
+      return false;
+    end,
     variable_query = [[
       (identifier) @variable
       (shorthand_property_identifier_pattern) @variable
       (property_identifier) @variable
     ]]
+  },
+  lua = {
+    ignore_query = [[
+    ]],
+    ignore_special_conditions = function(node)
+      return false;
+    end,
+    variable_query = [[
+        (parameters
+          (identifier) @variable
+        )
+      (variable_list
+        (identifier) @variable
+      )
+      (binary_expression
+        (identifier) @variable
+      )
+      (arguments
+        (identifier) @variable
+      )
+      (function_call
+        (method_index_expression
+          (identifier) @variable
+          ":"
+          (identifier)
+        )
+      )
+      (field
+        (identifier) @variable
+      )
+    ]],
   }
 }
 
--- ツリー全体を出力する関数
 local function print_tree(node, indent)
   indent = indent or ""
   print(indent .. node:type())
@@ -72,9 +120,13 @@ local function print_tree(node, indent)
   end
 end
 
+
 -- 既存のハイライトグループを削除する関数
 local function clear_highlights()
-  vim.api.nvim_buf_clear_namespace(0, namespace_id, 0, -1)
+  local buffers = vim.api.nvim_list_bufs()
+  for _, bufnr in ipairs(buffers) do
+    vim.api.nvim_buf_clear_namespace(bufnr, namespace_id, 0, -1)
+  end
   variable_colors = {}
   color_index = 1
 end
@@ -99,9 +151,6 @@ local function has_highlight(bufnr, namespace_id, hl_group, start_row, start_col
   return false
 end
 
-
--- tree-sitterのnodeを解析して変数をハイライトする
-
 -- tree-sitterのnodeを解析して変数をハイライトする
 local function analyze_buffer()
   -- 現在のバッファのファイルタイプを取得
@@ -116,17 +165,15 @@ local function analyze_buffer()
     -- ルートノードを取得
     local root = tree:root()
 
-
     -- 無視するノードを抽出するクエリ
     local ignore_query_string = queries[filetype].ignore_query
 
     local query = vim.treesitter.query.parse(filetype, ignore_query_string)
 
-    -- 無視するノードを実行して、無視する変数リストを作成
+    -- 無視するノードを実行して、無視する変数名リストを取得
     for id, node in query:iter_captures(root, 0, 0, -1) do
       local name = query.captures[id]
       local var_name = vim.treesitter.get_node_text(node, 0)
-      print(var_name)
       if type(var_name) == "table" then
         var_name = table.concat(var_name, "\n")
       end
@@ -141,45 +188,48 @@ local function analyze_buffer()
     -- クエリを実行して変数ノードを取得
     for id, node in query:iter_captures(root, 0, 0, -1) do
       local name = query.captures[id] -- クエリのキャプチャ名
-      if name == "variable" then
-        local var_name = vim.treesitter.get_node_text(node, 0)
-        if type(var_name) == "table" then
-          var_name = table.concat(var_name, "\n")
-        end
-
-        if contains_special_characters(var_name) then
-          -- 英数字以外だとハイライトグループ設定時にエラーになるので無視させる
-          goto continue
-        end
-        if (ignore_variables[var_name]) then
-          goto continue
-        end
-
-        local hl_group = "VariableColor" .. var_name
-        -- 変数に色を割り当てる
-        if not variable_colors[var_name] then
-          variable_colors[var_name] = colors[color_index]
-          color_index = color_index % #colors + 1
-          -- ハイライトグループを作成
-          vim.api.nvim_set_hl(0, hl_group, variable_colors[var_name])
-        end
-
-        local bufnr = vim.api.nvim_get_current_buf()
-        local start_row, start_col, end_row, end_col = node:range()
-        local is_highlighted = has_highlight(bufnr, namespace_id, hl_group, start_row, start_col, end_row, end_col)
-
-        if not is_highlighted then
-          -- 変数にハイライトを適用
-          vim.api.nvim_buf_add_highlight(bufnr, namespace_id, hl_group, start_row, start_col, end_col)
-        end
-
-        ::continue::
+      local var_name = vim.treesitter.get_node_text(node, 0)
+      if type(var_name) == "table" then
+        var_name = table.concat(var_name, "\n")
       end
+
+      if contains_special_characters(var_name)
+          or ignore_variables[var_name]
+          or queries[filetype].ignore_special_conditions(node)
+      then
+        goto continue
+      end
+
+      local hl_group = "VariableColor" .. var_name
+      -- 変数に色を割り当てる
+      if not variable_colors[var_name] then
+        variable_colors[var_name] = colors[color_index]
+        color_index = color_index % #colors + 1
+        -- ハイライトグループを作成
+        vim.api.nvim_set_hl(0, hl_group, variable_colors[var_name])
+      end
+
+      local bufnr = vim.api.nvim_get_current_buf()
+      local start_row, start_col, end_row, end_col = node:range()
+      local is_highlighted = has_highlight(bufnr, namespace_id, hl_group, start_row, start_col, end_row, end_col)
+
+      if not is_highlighted then
+        -- 変数にハイライトを適用
+        vim.api.nvim_buf_add_highlight(bufnr, namespace_id, hl_group, start_row, start_col, end_col)
+      end
+
+      ::continue::
     end
   end
 end
 
 local function initialize()
+  local bufnr = vim.api.nvim_get_current_buf()
+  local filetype = vim.bo.filetype
+  -- 無視するファイルタイプ
+  if vim.tbl_contains(ignore_initialize_filetypes, filetype) then
+    return
+  end
   clear_highlights()
   analyze_buffer()
 end
@@ -189,7 +239,7 @@ vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile", "BufEnter" }, {
 })
 
 vim.api.nvim_create_autocmd({ "TextChanged", "InsertLeave" }, {
-  callback = initialize,
+  callback = analyze_buffer,
 })
 
 -- TextChangedIイベントが発火したときにスペースが入力されたかどうかをチェックする関数
@@ -201,14 +251,17 @@ local function on_text_changed_i()
   end
 end
 
+vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile", "BufEnter" }, {
+  callback = analyze_buffer,
+})
+
 vim.api.nvim_create_autocmd("TextChangedI", {
   callback = on_text_changed_i,
 })
 
 -- Resetコマンドを作成
 vim.api.nvim_create_user_command('ResetSemanticHighlights', function()
-  clear_highlights()
-  analyze_buffer()
+  initialize()
 end, {})
 
 vim.api.nvim_create_user_command('PrintTree', function()
