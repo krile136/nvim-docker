@@ -11,7 +11,7 @@ return {
     })
     require("mason-lspconfig").setup({
       ensure_installed = {
-        'gopls', 'volar', 'intelephense', 'tsserver'
+        'gopls', 'volar', 'intelephense', 'ts_ls'
       },
     })
   end
