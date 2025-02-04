@@ -1,0 +1,4 @@
+pmset -g batt | awk -F "'" '
+    /Now drawing from/ {power_status=$2} 
+    /[0-9]+%/ {match($0, /[0-9]+%/); battery=substr($0, RSTART, RLENGTH); print substr(battery, 1, length(battery)-1) "," power_status}
+' > /Users/h-matsuoka/nvim-docker/batteryStatus.txt

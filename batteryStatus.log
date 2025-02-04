@@ -1,0 +1,3 @@
+/bin/sh: /Users/h-matsuoka/nvim-docker/getBatteryStatus.sh: Permission denied
+/bin/sh: /Users/h-matsuoka/nvim-docker/getBatteryStatus.sh: Permission denied
+/Users/h-matsuoka/nvim-docker/getBatteryStatus.sh: line 1: /Users/h-matsuoka/nvim-docker/batteryStatus.txt: Is a directory
