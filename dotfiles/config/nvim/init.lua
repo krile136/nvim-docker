@@ -16,25 +16,21 @@ local lazyOpts = {
 }
 require("lazy").setup({
   require('plugins/comment'),
-  -- require('plugins/copilot-cmp'),  -- copilotより先に読み込む
   require('plugins/copilot'),
   require('plugins/copilotChat'),
   require('plugins/copilot-lualine'),
+  require('plugins/lualine'),
   require('plugins/fidget'),
-  require('plugins/hlargs'),
   require('plugins/lsp-signature'),
   require('plugins/lspconfig'),
   require('plugins/lspsaga'),
-  require('plugins/lualine'),
   require('plugins/mason-tool-installer'),
   require('plugins/mason'),
   require('plugins/neoscroll'),
   require('plugins/noice'),
   require('plugins/none-ls'),
-  -- require('plugins/nvim-autopairs'),   -- copilotと競合 カッコは手で入れよう
   require('plugins/nvim-cmp'),
   require('plugins/nvim-scrollbar'),
-  require('plugins/nvim-tree'),
   require('plugins/nvim-treesitter'),
   require('plugins/smart-open'),
   require('plugins/telescope'),
@@ -42,18 +38,16 @@ require("lazy").setup({
   require('plugins/vscode'),
   require('plugins/render-markdown'),
   require('plugins/nvim-colorizer'),
+  require('plugins/oil'),
+  require('plugins/oil-git-status'),
+  require('plugins/git-blame'),
+  require('plugins/flash'),
 
   -- 後で読み込むことで正常に動くようになる
   require('plugins/modes'),
-  require('plugins/indent-blankline'),
+  -- require('plugins/indent-blankline'),
+  require('plugins/hlchunk'),
 }, lazyOpts)
-
-
---------------------- NvimTreeの色設定 ---------------------
-vim.cmd('hi NvimTreeExecFile guifg=#ffffff')
-
--- copilotの色設定
-vim.api.nvim_set_hl(0, "CmpItemKindCopilot", {fg ="#6CC644"})
 
 --------------------- floatの背景色をなくす ---------------------
 vim.cmd [[
@@ -64,8 +58,20 @@ vim.cmd [[
 -- Define highlight groups for icons
 vim.cmd('highlight LspIcon guifg=#99FF99 guibg=#303030')
 vim.cmd('highlight TimeIcon guifg=#99FFFF guibg=#303030')
+vim.cmd('highlight GitAlertIcon guifg=#FFFF00 guibg=#303030')
+vim.cmd('highlight GitIcon guifg=#F58220 guibg=#303030')
+vim.cmd('highlight EncodingIcon guifg=#ba82e3 guibg=#303030')
+vim.cmd('highlight BatteryChargingIcon guifg=#FFFF00 guibg=#303030')
+vim.cmd('highlight BatteryNoneIcon guifg=#8B0000 guibg=#303030')
+vim.cmd('highlight BatteryDangerIcon guifg=#8B0000 guibg=#303030')
+vim.cmd('highlight BatteryWarningIcon guifg=#BBBB44 guibg=#303030')
+vim.cmd('highlight BatteryGoodIcon guifg=#66AACC guibg=#303030')
+vim.cmd('highlight BatteryFullIcon guifg=#3BAF75 guibg=#303030')
+vim.cmd('highlight StatusText guifg=#C5C5C5 guibg=#303030')
+
 
 vim.cmd('highlight VertSplit guifg=#808080')
+
 
 vim.filetype.add({
   extension = {
@@ -75,20 +81,11 @@ vim.filetype.add({
   }
 })
 
--- Escキーを送信するマッピングを作成(Copilotのリセット用)
-vim.api.nvim_set_keymap('i', '<C-c>', '<Esc>', { noremap = true, silent = true })
+--------------------- semantic highlighting ---------------------
+require('settings/semantic-highlighting')
 
----------------------- clipboardをホストマシンと共有する -------------
-vim.g.clipboard = {
-  name = 'OSC 52',
-  copy = {
-    ['+'] = require('vim.ui.clipboard.osc52').copy('+'),
-    ['*'] = require('vim.ui.clipboard.osc52').copy('*'),
-  },
-  paste = {
-    ['+'] = require('vim.ui.clipboard.osc52').paste('+'),
-    ['*'] = require('vim.ui.clipboard.osc52').paste('*'),
-  },
-}
+require('settings/query-keyword-highlighting')
 
+
+-- require('settings/rainbow-ebiten')
 

@@ -5,7 +5,7 @@ local options = {
   hidden = true, -- bufferを切り替えるときに編集中ファイルを保存しなくても良くなる
   scrolloff = 10,  -- スクロールするときにマージンを10行分取っておく
   encoding = "utf-8", ---- ファイルを開いたときのデフォルトエンコードをutf-8にする
-  clipboard = vim.opt.clipboard + 'unnamed', -- クリップボードを使用できるようにする
+  clipboard = vim.opt.clipboard + 'unnamed,unnamedplus', -- クリップボードを使用できるようにする
   backspace = 'indent,eol,start',  -- バックスペースで削除できるようにする
   title = true,	-- ファイル名を表示する
   ignorecase = true, -- 検索時に大文字と小文字の区別をなくす
@@ -33,7 +33,7 @@ local global = {
   mnowrapscan = true, -- 検索が最下部で止まる（ファイルの先頭に戻らない）
   mapleader = " ",  -- leaderキーをスペースにする
   lsp_log_file = "",  -- lspのログ出力をOFFにする (lsp_log_verboseとセット)   これをやらないとlspの補完や参照がとても重い
-  lsp_log_verbose = 1,
+  lsp_log_verbose = 0,
 }
 
 for k, v in pairs(global) do
@@ -59,4 +59,15 @@ augroup highlight_yank
 augroup END
 ]], false)
 
-
+---------------------- clipboardをホストマシンと共有する -------------
+vim.g.clipboard = {
+  name = 'OSC 52',
+  copy = {
+    ['+'] = require('vim.ui.clipboard.osc52').copy('+'),
+    ['*'] = require('vim.ui.clipboard.osc52').copy('*'),
+  },
+  paste = {
+    ['+'] = require('vim.ui.clipboard.osc52').paste('+'),
+    ['*'] = require('vim.ui.clipboard.osc52').paste('*'),
+  },
+}

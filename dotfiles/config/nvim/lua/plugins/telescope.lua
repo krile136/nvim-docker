@@ -9,15 +9,79 @@ return {
     -- control + 右手のキーで対応したいがコンフリクトも多い要調整
     --
     vim.keymap.set('n', '<C-i>', builtin.live_grep, {})   -- ファイル内文字列検索
-    vim.keymap.set('n', '<C-y>', builtin.grep_string, {})     -- カーソル下の単語検索 
+    vim.keymap.set('n', '<C-p>', builtin.grep_string, {})     -- カーソル下の単語検索 
     vim.keymap.set('n', '<C-g>', builtin.git_status, {})     -- git statusの結果一覧
-    vim.keymap.set('n', '<C-k>', builtin.spell_suggest, {})     -- spellの候補
+    vim.keymap.set('n', '<C-k>', builtin.buffers, {})     -- spellの候補
     vim.keymap.set('n', '<leader>fh', builtin.help_tags, {})
 
     vim.keymap.set("n", "<C-j>", function ()
       require("telescope").extensions.smart_open.smart_open{
         cwd_only = true,
         theme = "dropdown",
+        show_scores = false,
+        ignore_patterns = {
+          "*.cls-meta.xml",
+          "*.git/*",
+          "*build/*",
+          "*debug/*",
+          "*.pdf",
+          "*.ico",
+          "*.class",
+          "*~",
+          "~:",
+          "*.jar",
+          "*.node",
+          "*.lock",
+          "*.gz",
+          "*.zip",
+          "*.7z",
+          "*.rar",
+          "*.lzma",
+          "*.bz2",
+          "*.rlib",
+          "*.rmeta",
+          "*.DS_Store",
+          "*.cur",
+          "*.png",
+          "*.jpeg",
+          "*.jpg",
+          "*.gif",
+          "*.bmp",
+          "*.avif",
+          "*.heif",
+          "*.jxl",
+          "*.tif",
+          "*.tiff",
+          "*.ttf",
+          "*.otf",
+          "*.woff*",
+          "*.sfd",
+          "*.pcf",
+          "*.ico",
+          "*.svg",
+          "*.ser",
+          "*.wasm",
+          "*.pack",
+          "*.pyc",
+          "*.apk",
+          "*.bin",
+          "*.dll",
+          "*.pdb",
+          "*.db",
+          "*.so",
+          "*.spl",
+          "*.min.js",
+          "*.min.gzip.js",
+          "*.so",
+          "*.doc",
+          "*.swp",
+          "*.bak",
+          "*.ctags",
+          "*.doc",
+          "*.ppt",
+          "*.xls",
+          "*.pdf",
+        },
       } 
     end, { noremap = true, silent = true })
 

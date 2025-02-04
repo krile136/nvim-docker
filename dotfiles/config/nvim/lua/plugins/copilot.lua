@@ -6,6 +6,8 @@ return {
     "zbirenbaum/copilot-cmp",
   },
   config = function()
+    vim.api.nvim_set_keymap('i', '<C-c>', '<Esc>', { noremap = true, silent = true })
+
     require("copilot").setup({
       panel = {
         enabled = false,    -- copilot-cmpを使うためpanelは使わない
