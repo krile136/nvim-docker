@@ -27,7 +27,7 @@ require("lazy").setup({
   require('plugins/mason-tool-installer'),
   require('plugins/mason'),
   require('plugins/neoscroll'),
-  require('plugins/noice'),
+  -- require('plugins/noice'),
   require('plugins/none-ls'),
   require('plugins/nvim-cmp'),
   require('plugins/nvim-scrollbar'),

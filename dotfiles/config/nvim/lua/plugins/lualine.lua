@@ -143,7 +143,6 @@ return {
         theme = bubbles_theme,
         component_separators = '|',
       },
-
       sections = {
         lualine_a = { 'mode' },
         lualine_b = {},
@@ -185,6 +184,7 @@ return {
           'location'
         }
       },
+
 
       inactive_sections = {
         lualine_a = {},
