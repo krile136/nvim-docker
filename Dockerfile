@@ -27,7 +27,7 @@ RUN add-apt-repository ppa:longsleep/golang-backports
 # openjdk-11-jd java11の実行環境(apexのformatterに必要)
 RUN apt update && \
     apt-get update && \
-    apt install -y curl git ripgrep tar unzip vim wget build-essential nodejs golang-go npm php-xml fd-find libunibilium-dev openjdk-11-jdk
+    apt install -y curl git ripgrep tar unzip vim wget build-essential nodejs golang-go npm php-xml fd-find libunibilium-dev openjdk-21-jdk
 
 # （途中でlocation聞かれて -y だけでは突破できない）
 ENV DEBIAN_FRONTEND=noninteractive
