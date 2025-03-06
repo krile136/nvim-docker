@@ -45,9 +45,9 @@ RUN wget https://github.com/neovim/neovim/releases/download/v0.10.1/nvim-linux64
 # nvim tree-sitter を使うために、tree-sitterをインストールするが
 # npm経由だとうまく行かないのでcargo経由でインストールする。
 # そのためにrustをインストールする
-RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
-ENV PATH="/root/.cargo/bin:$PATH"
-RUN cargo install tree-sitter-cli
+# RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
+# ENV PATH="/root/.cargo/bin:$PATH"
+# RUN cargo install tree-sitter-cli
 
 # vue(typescript)のLSPのためにnpmを使うが、aptで入れているnpmは古いので
 # バージョン管理のnを使って最新版を入れる（ついでにnodejsも最新版にする）
@@ -55,6 +55,9 @@ RUN npm install n -g
 RUN n stable
 RUN apt purge -y nodejs npm
 RUN apt autoremove -y
+
+# npmでtree-sitterをインストール
+RUN npm install -g tree-sitter-cli
 
 # salesforceのformatterをインストール
 RUN npm install --global prettier prettier-plugin-apex
@@ -68,7 +71,8 @@ RUN php composer-setup.php
 RUN php -r "unlink('composer-setup.php');"
 RUN mv ./composer.phar /usr/bin/composer && chmod +x /usr/bin/composer 
 
-RUN apt install -y locales && \
+RUN apt-get update && \
+    apt-get install -y locales && \
     locale-gen ja_JP.UTF-8
 
 # 設定ファイルをコピー

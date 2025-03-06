@@ -27,7 +27,6 @@ require("lazy").setup({
   require('plugins/mason-tool-installer'),
   require('plugins/mason'),
   require('plugins/neoscroll'),
-  -- require('plugins/noice'),
   require('plugins/none-ls'),
   require('plugins/nvim-cmp'),
   require('plugins/nvim-scrollbar'),
@@ -89,3 +88,12 @@ require('settings/query-keyword-highlighting')
 
 -- require('settings/rainbow-ebiten')
 
+-- Insert modeからNormal modeに戻った時に自動保存
+vim.api.nvim_create_autocmd({"InsertLeave","TextYankPost", "TextChanged"}, {
+  pattern = "*",
+  callback = function()
+    if vim.fn.expand('%:e') ~= '' then
+      vim.cmd("w")
+    end
+  end,
+})
