@@ -33,14 +33,14 @@ RUN apt update && \
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt install php-cli php-mbstring -y
 
-# neovim v0.10.1 をインストール
-RUN wget https://github.com/neovim/neovim/releases/download/v0.10.1/nvim-linux64.tar.gz && \
-    tar -zxvf nvim-linux64.tar.gz && \
-    mv nvim-linux64/bin/nvim usr/bin/nvim && \
-    mv nvim-linux64/lib/nvim usr/lib/nvim && \
-    mv nvim-linux64/share/nvim/ usr/share/nvim && \
-    rm -rf nvim-linux64 && \
-    rm nvim-linux64.tar.gz
+# neovim v0.10.4 をインストール
+RUN wget https://github.com/neovim/neovim/releases/download/v0.10.4/nvim-linux-x86_64.tar.gz && \
+    tar -zxvf nvim-linux-x86_64.tar.gz && \
+    mv nvim-linux-x86_64/bin/nvim usr/bin/nvim && \
+    mv nvim-linux-x86_64/lib/nvim usr/lib/nvim && \
+    mv nvim-linux-x86_64/share/nvim/ usr/share/nvim && \
+    rm -rf nvim-linux-x86_64 && \
+    rm nvim-linux-x86_64.tar.gz
 
 # nvim tree-sitter を使うために、tree-sitterをインストールするが
 # npm経由だとうまく行かないのでcargo経由でインストールする。
@@ -71,6 +71,7 @@ RUN php composer-setup.php
 RUN php -r "unlink('composer-setup.php');"
 RUN mv ./composer.phar /usr/bin/composer && chmod +x /usr/bin/composer 
 
+# よくわからんがもう一回apt-get updateを実行しないとエラーになってしまう
 RUN apt-get update && \
     apt-get install -y locales && \
     locale-gen ja_JP.UTF-8
