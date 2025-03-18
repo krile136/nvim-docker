@@ -1,4 +1,3 @@
-_G.vim = vim
 --------------------- basic settings ---------------------
 require('settings/basic')
 
@@ -20,15 +19,14 @@ require("lazy").setup({
   require('plugins/copilot'),
   require('plugins/copilotChat'),
   require('plugins/copilot-lualine'),
+  require('plugins/lualine'),
   require('plugins/fidget'),
   require('plugins/lsp-signature'),
   require('plugins/lspconfig'),
   require('plugins/lspsaga'),
-  require('plugins/lualine'),
   require('plugins/mason-tool-installer'),
   require('plugins/mason'),
   require('plugins/neoscroll'),
-  require('plugins/noice'),
   require('plugins/none-ls'),
   require('plugins/nvim-cmp'),
   require('plugins/nvim-scrollbar'),
@@ -41,65 +39,20 @@ require("lazy").setup({
   require('plugins/oil'),
   require('plugins/oil-git-status'),
   require('plugins/git-blame'),
-  require('plugins/hlchunk'),
+  require('plugins/flash'),
+  require('plugins/outline'),
 
   -- 後で読み込むことで正常に動くようになる
   require('plugins/modes'),
+  -- require('plugins/indent-blankline'),
+  require('plugins/hlchunk'),
 }, lazyOpts)
-
---------------------- NvimTreeの色設定 ---------------------
-vim.cmd('hi NvimTreeExecFile guifg=#ffffff')
 
 --------------------- floatの背景色をなくす ---------------------
 vim.cmd [[
   highlight NormalFloat guibg=NONE
   highlight FloatBorder guibg=NONE
 ]]
-
--- Define colors for each heading level
-vim.cmd('highlight RenderMarkdownH1Bg guibg=#FFCCCC')
-vim.cmd('highlight RenderMarkdownH2Bg guibg=#FFDDCC')
-vim.cmd('highlight RenderMarkdownH3Bg guibg=#FFEECC')
-vim.cmd('highlight RenderMarkdownH4Bg guibg=#FFFFCC')
-vim.cmd('highlight RenderMarkdownH5Bg guibg=#EEFFCC')
-vim.cmd('highlight RenderMarkdownH6Bg guibg=#DDFFCC')
-
--- Update the existing links to use the new colors
-vim.cmd('highlight link RenderMarkdownH1 RenderMarkdownH1Bg')
-vim.cmd('highlight link RenderMarkdownH2 RenderMarkdownH2Bg')
-vim.cmd('highlight link RenderMarkdownH3 RenderMarkdownH3Bg')
-vim.cmd('highlight link RenderMarkdownH4 RenderMarkdownH4Bg')
-vim.cmd('highlight link RenderMarkdownH5 RenderMarkdownH5Bg')
-vim.cmd('highlight link RenderMarkdownH6 RenderMarkdownH6Bg')
-
-
--- 特定の拡張子を別の拡張子として扱う
-vim.filetype.add({
-  extension = {
-    cls = 'apex',
-    trigger = 'apex',
-    cmp = 'html',
-  }
-})
-
----------------------- clipboardをホストマシンと共有する -------------
---itermなら有効だがghosttyだとできない
-vim.g.clipboard = {
-  name = 'OSC 52',
-  copy = {
-    ['+'] = require('vim.ui.clipboard.osc52').copy('+'),
-    ['*'] = require('vim.ui.clipboard.osc52').copy('*'),
-  },
-  paste = {
-    ['+'] = require('vim.ui.clipboard.osc52').paste('+'),
-    ['*'] = require('vim.ui.clipboard.osc52').paste('*'),
-  },
-}
-
---------------------- semantic highlighting ---------------------
-require('settings/semantic-highlighting')
-require('settings/specific-word-highlighting')
-
 
 -- Define highlight groups for icons
 vim.cmd('highlight LspIcon guifg=#99FF99 guibg=#303030')
@@ -114,3 +67,33 @@ vim.cmd('highlight BatteryWarningIcon guifg=#BBBB44 guibg=#303030')
 vim.cmd('highlight BatteryGoodIcon guifg=#66AACC guibg=#303030')
 vim.cmd('highlight BatteryFullIcon guifg=#3BAF75 guibg=#303030')
 vim.cmd('highlight StatusText guifg=#C5C5C5 guibg=#303030')
+
+
+vim.cmd('highlight VertSplit guifg=#808080')
+
+
+vim.filetype.add({
+  extension = {
+    cls = 'apex',
+    trigger = 'apex',
+    cmp = 'html',
+  }
+})
+
+--------------------- semantic highlighting ---------------------
+require('settings/semantic-highlighting')
+
+require('settings/specific-word-highlighting')
+
+
+-- require('settings/rainbow-ebiten')
+
+-- Insert modeからNormal modeに戻った時に自動保存
+vim.api.nvim_create_autocmd({ "InsertLeave", "TextYankPost", "TextChanged" }, {
+  pattern = "*",
+  callback = function()
+    if vim.fn.expand('%:e') ~= '' and vim.bo.modified then
+      vim.cmd("w")
+    end
+  end,
+})

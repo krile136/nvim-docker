@@ -36,7 +36,6 @@ return {
     set('n', 'gn', '<cmd>Lspsaga rename<CR>')                     -- 変数名を一括変更
     set('n', 'gw', '<cmd>Lspsaga show_workspace_diagnostics<CR>') -- workspaceの診断結果（エラーとか）を表示
     set('n', 'gb', '<cmd>Lspsaga show_buf_diagnostics<CR>')       -- workspaceの診断結果（エラーとか）を表示
-    set('n', 'gi', '<cmd>Lspsaga term_toggle<CR>')                -- ターミナルを開く
     set('n', 'gp', '<cmd>Lspsaga winbar_toggle<CR>')              -- 画面上部に開いているファイルのパスの表示を切り替え
   end,
   dependencies = {

@@ -1,3 +1,7 @@
+vim.cmd [[
+  highlight CustomLightBlue guifg=#ADD8E6
+]]
+
 return {
   'stevearc/oil.nvim',
   ---@module 'oil'
@@ -26,6 +30,20 @@ return {
           end,
         },
       },
+      view_options = {
+        -- Show files and directories that start with "."
+        show_hidden = true,
+        is_always_hidden = function(name, bufnr)
+          -- 名前に"cls-meta" が含まれるファイルは非表示
+          if name:match("cls%-meta") then
+            return true
+          end
+          return false
+        end,
+        -- Customize the highlight group for the file name
+        highlight_filename = function(entry, is_hidden, is_link_target, is_link_orphan)
+        end,
+      }
     })
   end,
 }

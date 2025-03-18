@@ -29,11 +29,11 @@ local color_index = 1
 local namespace_id = vim.api.nvim_create_namespace("VariableColorNamespace")
 
 -- ファイルタイプごとのクエリを定義するテーブル
--- variable_queryだけで頑張ろうとするとネストが深いものなど取りこぼしがあるかもしれないので
 -- variable_queryで広く取りつつ、ignore_queryで無視するノードを細かく指定する
 -- それでも色がついてしまうnodeについてはignore_special_conditionsでさらに細かく無視する条件を指定する
 local queries = {
   apex = {
+    as = "apex",
     ignore_query = [[
     ]],
     ignore_special_conditions = function(node)
@@ -45,18 +45,78 @@ local queries = {
       return false
     end,
     variable_query = [[
+      (variable_declarator
+        (identifier) @variable
+      )
+      (formal_parameter
+        (identifier) @variable
+      )
+      (field_access
+        (identifier) @variable
+      )
+      (assignment_expression
+        (identifier) @variable
+      )
+      (binary_expression
+        (identifier) @variable
+      )
+      (method_invocation
+        (identifier) @variable
+        "."
+        (identifier)
+      )
+      (argument_list
+        (identifier) @variable
+      )
+      (parenthesized_expression
+        (identifier) @variable
+      )
+      (return_statement
+        (identifier) @variable
+      )
+      (enhanced_for_statement
+        (identifier) @variable
+      )
+      (update_expression
+        (identifier) @variable
+      )
+      (array_initializer
+        (identifier) @variable
+      )
+      (array_access
+        (identifier) @variable
+      )
+      (catch_formal_parameter
+        (identifier) @variable
+      )
+      (bound_apex_expression
+        (identifier) @variable
+      )
+      (map_initializer
+        (identifier) @variable
+      )
+      (dml_expression
+        (identifier) @variable
+      )
+      (unary_expression
+        (identifier) @variable
+      )
     ]],
   },
   go = {
+    as = "go",
     ignore_query = "",
     ignore_special_conditions = function(node)
       return false;
     end,
     variable_query = [[
-      (identifier) @variable
+      (expression_list
+        (identifier) @variable
+      )
     ]],
   },
   php = {
+    as = "php",
     ignore_query = "",
     ignore_special_conditions = function(node)
       return false;
@@ -67,11 +127,17 @@ local queries = {
     ]]
   },
   typescript = {
+    as = "typescript",
     ignore_query = [[
       (function_declaration name: (identifier) @function.name)
     ]],
     ignore_special_conditions = function(node)
-      return false;
+      local var_name = vim.treesitter.get_node_text(node, 0)
+      -- var_nameの先頭が大文字かどうかを判定
+      if var_name:sub(1, 1):match("%u") then
+        return true
+      end
+      return false
     end,
     variable_query = [[
       (identifier) @variable
@@ -79,39 +145,38 @@ local queries = {
       (property_identifier) @variable
     ]]
   },
-  lua = {
+  typescriptreact = {
+    as = "tsx",
     ignore_query = [[
     ]],
     ignore_special_conditions = function(node)
-      return false;
     end,
     variable_query = [[
-        (parameters
-          (identifier) @variable
-        )
-      (variable_list
+      (import_specifier
         (identifier) @variable
       )
-      (binary_expression
+      (variable_declarator
         (identifier) @variable
       )
+      (property_signature
+        (property_identifier) @variable
+      )
+      (required_parameter
+        (identifier) @variable
+      )
+      (member_expression
+        (identifier) @variable
+      )
+      (property_identifier) @variable
       (arguments
         (identifier) @variable
       )
-      (function_call
-        (method_index_expression
-          (identifier) @variable
-          ":"
-          (identifier)
-        )
-      )
-      (field
-        (identifier) @variable
-      )
-    ]],
+      (shorthand_property_identifier_pattern) @variable
+    ]]
   }
 }
 
+-- ツリー全体を出力する関数
 local function print_tree(node, indent)
   indent = indent or ""
   print(indent .. node:type())
@@ -120,9 +185,13 @@ local function print_tree(node, indent)
   end
 end
 
-
 -- 既存のハイライトグループを削除する関数
 local function clear_highlights()
+  local mode = vim.api.nvim_get_mode().mode
+  if mode == 'c' then
+    return
+  end
+
   local buffers = vim.api.nvim_list_bufs()
   for _, bufnr in ipairs(buffers) do
     vim.api.nvim_buf_clear_namespace(bufnr, namespace_id, 0, -1)
@@ -153,11 +222,18 @@ end
 
 -- tree-sitterのnodeを解析して変数をハイライトする
 local function analyze_buffer()
+  local mode = vim.api.nvim_get_mode().mode
+  if mode == 'c' then
+    return
+  end
+
   -- 現在のバッファのファイルタイプを取得
   local filetype = vim.bo.filetype
 
   -- 対応するファイルタイプの場合のみ実行
   if queries[filetype] then
+    treesitter_filetype = queries[filetype].as
+
     -- 現在のバッファのツリーパーサーを取得
     local parser = vim.treesitter.get_parser(0)
     local tree = parser:parse()[1]
@@ -168,9 +244,9 @@ local function analyze_buffer()
     -- 無視するノードを抽出するクエリ
     local ignore_query_string = queries[filetype].ignore_query
 
-    local query = vim.treesitter.query.parse(filetype, ignore_query_string)
+    local query = vim.treesitter.query.parse(treesitter_filetype, ignore_query_string)
 
-    -- 無視するノードを実行して、無視する変数名リストを取得
+    -- 無視するノードを実行して、無視する変数リストを作成
     for id, node in query:iter_captures(root, 0, 0, -1) do
       local name = query.captures[id]
       local var_name = vim.treesitter.get_node_text(node, 0)
@@ -183,7 +259,7 @@ local function analyze_buffer()
     -- 変数ノードを抽出するクエリ
     local query_string = queries[filetype].variable_query
 
-    query = vim.treesitter.query.parse(filetype, query_string)
+    query = vim.treesitter.query.parse(treesitter_filetype, query_string)
 
     -- クエリを実行して変数ノードを取得
     for id, node in query:iter_captures(root, 0, 0, -1) do
@@ -234,11 +310,7 @@ local function initialize()
   analyze_buffer()
 end
 
-vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile", "BufEnter" }, {
-  callback = analyze_buffer,
-})
-
-vim.api.nvim_create_autocmd({ "TextChanged", "InsertLeave" }, {
+vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile", "BufEnter", "TextChanged", "InsertLeave" }, {
   callback = analyze_buffer,
 })
 
@@ -250,10 +322,6 @@ local function on_text_changed_i()
     analyze_buffer()
   end
 end
-
-vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile", "BufEnter" }, {
-  callback = analyze_buffer,
-})
 
 vim.api.nvim_create_autocmd("TextChangedI", {
   callback = on_text_changed_i,

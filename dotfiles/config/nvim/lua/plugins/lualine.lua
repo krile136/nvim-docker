@@ -1,4 +1,3 @@
-
 return {
   'nvim-lualine/lualine.nvim',
   config = function()
@@ -42,7 +41,7 @@ return {
     -- LSPクライアントを表示する
     local function lsp_clients()
       local clients = vim.lsp.get_active_clients({ bufnr = 0 })
-      local noClients = "%#LspIcon# %#StatusText# no LSP clinet"
+      local noClients = "%#LspIcon#%#StatusText#  no LSP clinet"
       if next(clients) == nil then
         return noClients
       end
@@ -54,8 +53,7 @@ return {
       end
 
       if next(client_names) == nil then return noClients end
-      -- return "%#TimeIcon#%#StatusText#  " .. table.concat(client_names, ", ")
-      return "%#LspIcon# %#StatusText# " .. table.concat(client_names, ", ")
+      return "%#LspIcon#%#StatusText#  " .. table.concat(client_names, ", ")
     end
 
     -- 現在時刻をアイコンと一緒に表示する
@@ -145,12 +143,11 @@ return {
         theme = bubbles_theme,
         component_separators = '|',
       },
-
       sections = {
         lualine_a = { 'mode' },
         lualine_b = {},
-        lualine_c = { 
-          { 'filename', path = 1 }, 
+        lualine_c = {
+          { 'filename', path = 1 },
         },
         lualine_x = { 'diagnostics', 'diff' },
         lualine_y = {
@@ -188,6 +185,7 @@ return {
         }
       },
 
+
       inactive_sections = {
         lualine_a = {},
         lualine_b = {},
@@ -201,5 +199,3 @@ return {
     }
   end
 }
-
-
