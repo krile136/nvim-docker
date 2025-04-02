@@ -24,7 +24,7 @@ RUN add-apt-repository ppa:longsleep/golang-backports
 # php-xml  phpのxmlパッケージ(phpのLSPで使用していたような？）
 # fd-find  ファイル検索ツール(telecopeでより早い検索に使用)
 # libunibilium-dev  なくてもneovimは動くが、色がおかしくなる
-# openjdk-11-jd java11の実行環境(apexのformatterに必要)
+# openjdk-21-jd java21の実行環境(apexのformatterやLSPの必要)
 RUN apt update && \
     apt-get update && \
     apt install -y curl git ripgrep tar unzip vim wget build-essential nodejs golang-go npm php-xml fd-find libunibilium-dev openjdk-21-jdk
@@ -59,8 +59,8 @@ RUN apt autoremove -y
 # npmでtree-sitterをインストール
 RUN npm install -g tree-sitter-cli
 
-# salesforceのformatterをインストール
-RUN npm install --global prettier prettier-plugin-apex
+# salesforceのformatterとsaleforce CLIをインストール
+RUN npm install --global prettier prettier-plugin-apex @salesforce/cli
 
 # composer install  php-cliとphp-mbstringを使っている（らしい）
 # インストールに失敗する場合は、hash値が違っている可能性が高いので公式を参考に修正する

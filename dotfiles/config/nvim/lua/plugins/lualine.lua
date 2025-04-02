@@ -14,7 +14,7 @@ return {
       red      = '#ff5189',
       violet   = '#d183e8',
       grey     = '#303030',
-      darkGrey = '#7d7d7d'
+      darkGrey = '#A9A9A9',
     }
 
     local bubbles_theme = {
@@ -138,6 +138,38 @@ return {
       return battery_message
     end
 
+    -- 選択範囲の行数と文字数を表示する
+    local function selectionCount()
+      local mode = vim.fn.mode()
+      local start_line, end_line, start_pos, end_pos
+
+      -- 選択モードでない場合には無効
+      if not (mode:find("[vV\22]") ~= nil) then return "" end
+      start_line = vim.fn.line("v")
+      end_line = vim.fn.line(".")
+
+      if mode == 'V' then
+        -- 行選択モードの場合は、各行全体をカウントする
+        start_pos = 1
+        end_pos = vim.fn.strlen(vim.fn.getline(end_line)) + 1
+      else
+        start_pos = vim.fn.col("v")
+        end_pos = vim.fn.col(".")
+      end
+
+      local chars = 0
+      for i = start_line, end_line do
+        local line = vim.fn.getline(i)
+        local line_len = vim.fn.strlen(line)
+        local s_pos = (i == start_line) and start_pos or 1
+        local e_pos = (i == end_line) and end_pos or line_len + 1
+        chars = chars + vim.fn.strchars(line:sub(s_pos, e_pos - 1))
+      end
+
+      local lines = math.abs(end_line - start_line) + 1
+      return tostring(lines) .. " lines, " .. tostring(chars) .. " characters"
+    end
+
     require('lualine').setup {
       options = {
         theme = bubbles_theme,
@@ -147,16 +179,38 @@ return {
         lualine_a = { 'mode' },
         lualine_b = {},
         lualine_c = {
-          { 'filename', path = 1 },
+          { 'filename', path = 0 },
         },
-        lualine_x = { 'diagnostics', 'diff' },
+        lualine_x = {
+          { 'diagnostics' },
+          { 'diff' }
+        },
         lualine_y = {
           { 'filetype' },
-          { lsp_clients,        color = { fg = colors.white, bg = colors.grey } },
+          { lsp_clients, color = { fg = colors.white, bg = colors.grey } },
+          {
+            function()
+              local alias = require 'salesforce.org_manager':get_default_alias()
+              if alias and alias ~= "" then
+                return "%#SalesforceIcon#󰢎 %#StatusText# " .. alias
+              end
+              return ""
+            end,
+            icon = nil, -- アイコンは関数内で動的に設定
+          },
           { branch_with_icon,   color = { fg = colors.white, bg = colors.grey } },
           { encoding_with_icon, color = { fg = colors.white, bg = colors.grey } },
-          { battery_status,     color = { fg = colors.white, bg = colors.grey } },
-          { current_time,       color = { fg = colors.white, bg = colors.grey } },
+          {
+            'fileformat',
+            icons_enabled = true,
+            symbols = {
+              unix = '%#fileFormatIcon# %#FileFormatText# LF',
+              dos = '%#fileFormatIcon# %#FileFormatText# CRLF',
+              mac = '%#fileFormatIcon# %#FileFormatText# CR',
+            },
+          },
+          { battery_status, color = { fg = colors.white, bg = colors.grey } },
+          { current_time,   color = { fg = colors.white, bg = colors.grey } },
           { 'copilot',
             symbols = {
               status = {
@@ -194,7 +248,19 @@ return {
         lualine_y = {},
         lualine_z = {},
       },
-      tabline = {},
+      tabline = {
+        lualine_c = {
+          {
+            'filename',
+            path = 1, -- 1: relative path
+            color = { fg = colors.darkGrey },
+          },
+        },
+        lualine_x = {
+          { selectionCount },
+        },
+        lualine_y = {},
+      },
       extensions = {},
     }
   end

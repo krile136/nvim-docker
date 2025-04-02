@@ -15,8 +15,8 @@ return {
     virtual_text_column = 1,                                -- virtual text start column, check Start virtual text at column section for more options
   },
   config = function(_, opts)
-    -- CursorLinexxx guibg=#222222 と背景色を合わせてある
-    vim.cmd("highlight git-blame guifg=#696969 guibg=#222222")
+    -- CursorLinexxx guibg=#363636 と背景色を合わせてある
+    vim.cmd("highlight git-blame guifg=#696969 guibg=#363636")
     vim.g.gitblame_highlight_group = "git-blame"
     vim.g.gitblame_delay = 0
 

@@ -1,3 +1,5 @@
+_G.vim = vim
+
 --------------------- options ---------------------
 local options = {
   number = true,                             -- 行番号を表示
@@ -58,3 +60,16 @@ augroup highlight_yank
     autocmd TextYankPost * silent! lua vim.highlight.on_yank{higroup="IncSearch", timeout=300}
 augroup END
 ]], false)
+
+---------------------- clipboardをホストマシンと共有する -------------
+vim.g.clipboard = {
+  name = 'OSC 52',
+  copy = {
+    ['+'] = require('vim.ui.clipboard.osc52').copy('+'),
+    ['*'] = require('vim.ui.clipboard.osc52').copy('*'),
+  },
+  paste = {
+    ['+'] = require('vim.ui.clipboard.osc52').paste('+'),
+    ['*'] = require('vim.ui.clipboard.osc52').paste('*'),
+  },
+}
