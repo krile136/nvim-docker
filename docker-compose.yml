@@ -24,3 +24,6 @@ services:
             - ./batteryStatus.txt:/root/batteryStatus.txt
             # READMEをコンテナ内でも編集できるように
             - ./README.md:/root/README.md
+            # sf cliの認証情報をコンテナにコピー
+            - ./sfdx:/root/.sfdx
+            - ./sf:/root/.sf

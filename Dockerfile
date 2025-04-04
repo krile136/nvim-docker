@@ -59,8 +59,8 @@ RUN apt autoremove -y
 # npmでtree-sitterをインストール
 RUN npm install -g tree-sitter-cli
 
-# salesforceのformatterをインストール
-RUN npm install --global prettier prettier-plugin-apex
+# salesforceのformatterとsaleforce CLIをインストール
+RUN npm install --global prettier prettier-plugin-apex @salesforce/cli
 
 # composer install  php-cliとphp-mbstringを使っている（らしい）
 # インストールに失敗する場合は、hash値が違っている可能性が高いので公式を参考に修正する

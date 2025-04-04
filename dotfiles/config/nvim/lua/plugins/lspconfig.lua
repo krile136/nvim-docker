@@ -2,6 +2,7 @@ return {
  "neovim/nvim-lspconfig",
   config = function()
     nvim_lsp = require('lspconfig')
+    vim.lsp.set_log_level(vim.lsp.log_levels.ERROR)
 
     local custom_attach = function(client, bufnr)
       require('lsp_signature').on_attach({
@@ -49,20 +50,31 @@ return {
         }
     }
 
-nvim_lsp['apex_ls'].setup{
-  cmd = { 'java', '-jar', '/root/.local/share/nvim/mason/share/apex-language-server/apex-jorje-lsp.jar' },
-  filetypes = { 'apex' },
-  on_attach = custom_attach,
-  flags = {
-    debounce_text_changes = 150,
-  },
-  settings = {
-    apex = {
-      enable_semantic_errors = true,
-      enable_completion_statistics = true,
+    nvim_lsp['lua_ls'].setup{
+        on_attach = custom_attach,
+        on_init = function(client, _)
+            client.server_capabilities.semanticTokensProvider = nil
+        end,
+        flag = {
+            debounce_text_changes = 150,
+        }
     }
-  }
-}
+
+
+    nvim_lsp['apex_ls'].setup{
+      cmd = { 'java', '-jar', '/root/.local/share/nvim/mason/share/apex-language-server/apex-jorje-lsp.jar' },
+      filetypes = { 'apex' },
+      on_attach = custom_attach,
+      flags = {
+        debounce_text_changes = 150,
+      },
+      settings = {
+        apex = {
+          enable_semantic_errors = true,
+          enable_completion_statistics = true,
+        }
+      }
+    }
 
     -- keyboard shortcut
     -- ctrl + o で定義ジャンプ元に戻れる

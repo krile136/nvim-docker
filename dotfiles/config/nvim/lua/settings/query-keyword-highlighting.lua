@@ -6,6 +6,7 @@ local queries = {
   apex = [[
     (string_literal) @string_literal
     (modifier) @modifier
+    (line_comment) @line_comment
   ]],
   go = [[
   ]],
@@ -27,7 +28,11 @@ local triggerSetting = {
   testMethod = {
     color = { fg="#000000", bg = "#87CEFA"},  -- LightSkyBlue
     keyword = "testMethod",
-  }
+  },
+  holizonLine = {
+    color = { fg="#000000", bg = "#D3D3D3"},  -- LightGrey
+    keyword = "-------",
+  },
 }
 
 -- triggerSetting毎にハイライトグループを登録

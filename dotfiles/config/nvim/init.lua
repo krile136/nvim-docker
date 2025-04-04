@@ -36,11 +36,13 @@ require("lazy").setup({
   require('plugins/tokyonight'),
   require('plugins/vscode'),
   require('plugins/render-markdown'),
+  require('plugins/salesforce'),
   require('plugins/nvim-colorizer'),
   require('plugins/oil'),
   require('plugins/oil-git-status'),
   require('plugins/git-blame'),
   require('plugins/flash'),
+  require('plugins/outline'),
 
   -- 後で読み込むことで正常に動くようになる
   require('plugins/modes'),
@@ -67,6 +69,10 @@ vim.cmd('highlight BatteryWarningIcon guifg=#BBBB44 guibg=#303030')
 vim.cmd('highlight BatteryGoodIcon guifg=#66AACC guibg=#303030')
 vim.cmd('highlight BatteryFullIcon guifg=#3BAF75 guibg=#303030')
 vim.cmd('highlight StatusText guifg=#C5C5C5 guibg=#303030')
+vim.cmd('highlight SalesforceIcon guifg=#459BD7 guibg=#303030')
+vim.cmd('highlight FileFormatIcon guifg=#FF69B4 guibg=#303030')
+vim.cmd('highlight FileFormatText guifg=#C5C5C5 guibg=#303030')
+
 
 
 vim.cmd('highlight VertSplit guifg=#808080')
@@ -92,7 +98,7 @@ require('settings/query-keyword-highlighting')
 vim.api.nvim_create_autocmd({"InsertLeave","TextYankPost", "TextChanged"}, {
   pattern = "*",
   callback = function()
-    if vim.fn.expand('%:e') ~= '' then
+    if vim.fn.expand('%:e') ~= '' and vim.bo.modified then
       vim.cmd("w")
     end
   end,
