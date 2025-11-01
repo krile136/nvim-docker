@@ -61,6 +61,9 @@ return {
       return "%#TimeIcon# %#StatusText# " .. os.date("%H:%M:%S")
     end
 
+    local function current_date()
+      return "%#DateIcon# %#StatusText# " .. os.date("%m/%d(%a)")
+    end
 
     -- ブランチ名を表示する
     -- masterとmainに対して警告を出したいのでカスタム関数を使用
@@ -138,6 +141,67 @@ return {
       return battery_message
     end
 
+    local cached_calendar_event = ""
+    local last_calendar_check_time = 0
+    local calendar_cache_duration = 20000 -- キャッシュの有効期間（ミリ秒）
+
+    local function next_calendar_event()
+      local now = vim.loop.now()
+      local mode = vim.api.nvim_get_mode().mode
+      if mode == 'v' or mode == 'V' or mode == '\22' then
+        return ""
+      end
+
+      if not cached_calendar_event or (now - last_calendar_check_time > calendar_cache_duration) then
+        local file, err = io.open("/root/calendar_lualine.txt", "r")
+        if not file then
+          cached_calendar_event = ""
+        else
+          local date_now = os.date("*t")
+          local current_minutes = date_now.hour * 60 + date_now.min
+          local next_event = nil
+          local next_start_minutes = nil
+
+          for line in file:lines() do
+            local title, time_str, place = line:match("([^,]+),([^,]+),(.+)")
+            if title and time_str and place then
+              title = title:gsub("%s*%b()", "")
+              local start_h, start_m, end_h, end_m = time_str:match("today at (%d+):(%d+) %- (%d+):(%d+)")
+              if start_h and start_m and end_h and end_m then
+                local start_minutes = tonumber(start_h) * 60 + tonumber(start_m)
+                if start_minutes >= current_minutes then
+                  if not next_start_minutes or start_minutes < next_start_minutes then
+                    next_start_minutes = start_minutes
+                    local places = {}
+                    for p in place:gmatch("[^;]+") do
+                      if not p:find("Microsoft") then
+                        table.insert(places, vim.trim(p))
+                      end
+                    end
+                    local place_str = table.concat(places, "; ")
+                    next_event = {
+                      title = title,
+                      time = string.format("%s:%s - %s:%s", start_h, start_m, end_h, end_m),
+                      place = place_str
+                    }
+                  end
+                end
+              end
+            end
+          end
+          file:close()
+          if next_event then
+            cached_calendar_event = string.format("%s | %s | %s | %s", current_date(), next_event.title, next_event.time, next_event.place)
+          else
+            cached_calendar_event = "本日の次の予定はありません"
+          end
+        end
+        last_calendar_check_time = now
+      end
+
+      return cached_calendar_event
+    end
+
     -- 選択範囲の行数と文字数を表示する
     local function selectionCount()
       local mode = vim.fn.mode()
@@ -163,7 +227,7 @@ return {
         local line_len = vim.fn.strlen(line)
         local s_pos = (i == start_line) and start_pos or 1
         local e_pos = (i == end_line) and end_pos or line_len + 1
-        chars = chars + vim.fn.strchars(line:sub(s_pos, e_pos - 1))
+        chars = chars + vim.fn.strchars(line:sub(s_pos, e_pos))
       end
 
       local lines = math.abs(end_line - start_line) + 1
@@ -174,16 +238,20 @@ return {
       options = {
         theme = bubbles_theme,
         component_separators = '|',
+        active = function()
+          return vim.bo.buftype == ''
+        end,
       },
       sections = {
         lualine_a = { 'mode' },
-        lualine_b = {},
-        lualine_c = {
+        lualine_b = {
           { 'filename', path = 0 },
         },
+        lualine_c = {
+          { 'diff' },
+          { 'diagnostics' }
+        },
         lualine_x = {
-          { 'diagnostics' },
-          { 'diff' }
         },
         lualine_y = {
           { 'filetype' },
@@ -257,9 +325,11 @@ return {
           },
         },
         lualine_x = {
+        },
+        lualine_y = {
+          { next_calendar_event },
           { selectionCount },
         },
-        lualine_y = {},
       },
       extensions = {},
     }

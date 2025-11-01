@@ -11,7 +11,7 @@ return {
   -- dependencies = { { "echasnovski/mini.icons", opts = {} } },
   dependencies = { "nvim-tree/nvim-web-devicons" }, -- use if prefer nvim-web-devicons
   config = function()
-    map('n', '<Leader>e', ':Oil<CR>', {noremap=true})
+    map('n', '<Leader>e', '<Cmd>Oil<CR>', {noremap=true})
 
     require('oil').setup({
       win_options = {
