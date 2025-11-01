@@ -1,18 +1,34 @@
 -- 色のリスト
 local colors = {
-  { fg = "#ef9062" },
-  { fg = "#35D27F" },
-  { fg = "#EB75D6" },
-  { fg = "#E5D180" },
-  { fg = "#8997F5" },
-  { fg = "#D49DA5" },
-  { fg = "#F6B223" },
-  { fg = "#F67C1B" },
-  { fg = "#BBEA87" },
-  { fg = "#FF6F61" },
-  { fg = "#88B04B" },
-  { fg = "#F7CAC9" },
-  { fg = "#C3447A" },
+-- 鮮やかな基本色 (Vibrant Basics)
+  { fg = "#FF6F61" }, -- 1. Coral (コーラルレッド)
+  { fg = "#F67C1B" }, -- 2. Bright Orange (明るいオレンジ)
+  { fg = "#E5D180" }, -- 3. Mellow Yellow (黄)
+  { fg = "#35D27F" }, -- 4. Bright Green (明るい緑)
+  { fg = "#2AAA8A" }, -- 5. Teal (ティール/青緑)
+  { fg = "#61AFEF" }, -- 6. Bright Blue (明るい青)
+  { fg = "#C678DD" }, -- 7. Bright Purple (明るい紫)
+  { fg = "#EB75D6" }, -- 8. Bright Pink (明るいピンク)
+
+  -- 落ち着いた中間色 (Muted Mid-tones)
+  { fg = "#E06C75" }, -- 9. Soft Red (ソフトな赤)
+  { fg = "#ef9062" }, -- 10. Soft Orange (ソフトなオレンジ)
+  { fg = "#D19A66" }, -- 11. Brownish (茶色系)
+  { fg = "#88B04B" }, -- 12. Olive (オリーブ)
+  { fg = "#56B6C2" }, -- 13. Cyan (シアン)
+  { fg = "#8997F5" }, -- 14. Periwinkle (ペリウィンクル/青紫)
+  { fg = "#C3447A" }, -- 15. Maroon (マルーン/暗めの赤紫)
+  { fg = "#D49DA5" }, -- 16. Dusty Rose (くすんだピンク)
+
+  -- 明るいアクセント色 (Bright Accents)
+  { fg = "#F6B223" }, -- 17. Gold (ゴールド)
+  { fg = "#BBEA87" }, -- 18. Lime (ライムグリーン)
+  { fg = "#80FFEA" }, -- 19. Aqua (アクア)
+  { fg = "#96CDFB" }, -- 20. Sky Blue (スカイブルー)
+  { fg = "#DDB6F2" }, -- 21. Lavender (ラベンダー)
+  { fg = "#F28FAD" }, -- 22. Rosewater (ローズウォーター)
+  { fg = "#F8BD96" }, -- 23. Peach (ピーチ)
+  { fg = "#ABE9B3" }, -- 24. Mint (ミント)}
 }
 
 -- 初期化を走らせたくないファイルタイプを管理するテーブル
@@ -38,11 +54,11 @@ local queries = {
     ]],
     ignore_special_conditions = function(node)
       local var_name = vim.treesitter.get_node_text(node, 0)
-      -- var_nameの先頭が大文字かどうかを判定
-      if var_name:sub(1, 1):match("%u") then
-        return true
-      end
-      return false
+       -- var_nameの先頭が大文字かどうかを判定
+       if var_name:sub(1, 1):match("%u") then
+         return true
+       end
+       return false
     end,
     variable_query = [[
       (variable_declarator
@@ -101,10 +117,13 @@ local queries = {
       (unary_expression
         (identifier) @variable
       )
+      (cast_expression
+        (identifier) @variable
+      )
     ]],
   },
   go = {
-    as = "go",
+    as ="go",
     ignore_query = "",
     ignore_special_conditions = function(node)
       return false;
@@ -127,17 +146,23 @@ local queries = {
     ]]
   },
   typescript = {
-    as = "typescript",
+    as="typescript",
     ignore_query = [[
       (function_declaration name: (identifier) @function.name)
+      (call_expression 
+        function: (member_expression
+          property: (property_identifier) @method.call
+        )
+      )
     ]],
     ignore_special_conditions = function(node)
       local var_name = vim.treesitter.get_node_text(node, 0)
-      -- var_nameの先頭が大文字かどうかを判定
-      if var_name:sub(1, 1):match("%u") then
-        return true
-      end
-      return false
+       -- var_nameの先頭が大文字かどうかを判定
+       if var_name:sub(1, 1):match("%u") then
+         return true
+       end
+       return false
+
     end,
     variable_query = [[
       (identifier) @variable
@@ -146,10 +171,16 @@ local queries = {
     ]]
   },
   typescriptreact = {
-    as = "tsx",
+    as="tsx",
     ignore_query = [[
     ]],
     ignore_special_conditions = function(node)
+      local var_name = vim.treesitter.get_node_text(node, 0)
+      -- var_nameに()が含まれているかどうかを判定
+      if var_name:match("%b()") then
+        return true
+      end
+      return false
     end,
     variable_query = [[
       (import_specifier
@@ -270,8 +301,8 @@ local function analyze_buffer()
       end
 
       if contains_special_characters(var_name)
-          or ignore_variables[var_name]
-          or queries[filetype].ignore_special_conditions(node)
+        or ignore_variables[var_name]
+        or queries[filetype].ignore_special_conditions(node)
       then
         goto continue
       end
@@ -340,4 +371,4 @@ vim.api.nvim_create_user_command('PrintTree', function()
 end, {})
 
 
-map('n', '<Leader>r', ':ResetSemanticHighlights<CR>', { noremap = true })
+map('n', '<Leader>r', '<Cmd>ResetSemanticHighlights<CR>', { noremap = true })

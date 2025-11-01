@@ -6,7 +6,7 @@ return {
     local sources = {
       null_ls.builtins.formatting.prettier.with({
         filetypes = { "apex" },                  -- Apexファイルに対してprettierを使用
-        extra_args = { "--print-width", "150" }, -- 追加のオプション
+        extra_args = { "--print-width", "115" }, -- 追加のオプション
       }),
       null_ls.builtins.formatting.prettier.with({
         filetypes = { "html" }, -- HTMLファイルに対してprettierを使用

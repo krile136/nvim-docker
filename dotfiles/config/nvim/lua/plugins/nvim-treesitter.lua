@@ -2,7 +2,7 @@ return {
   "nvim-treesitter/nvim-treesitter",
   config = function()
     require('nvim-treesitter.configs').setup({
-      ensure_installed = {
+    ensure_installed = {
         "lua",
         "go",
         "php",
@@ -10,18 +10,22 @@ return {
         "markdown_inline",
         "typescript",
         "apex",
+        "soql",
+        "sosl",
+        "sflog",
         "html",
+        "http",
       },
       highlight = {
         enable = true,
         indent = {
-          enable = true,
-        },
+				  enable = true,
+		    },
       },
       indent = {
         enable = true,
       }
     }
-    )
+  )
   end
 }
