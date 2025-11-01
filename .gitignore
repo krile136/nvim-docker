@@ -2,8 +2,13 @@
 /cache
 /github-copilot
 /parser
-/batteryStatus.log
+/sh/getBatteryStatus.sh
+/sh/calendar_to_txt.sh
+/hostMachine
 /batteryStatus.txt
 /getBatteryStatus.sh
 /sf
 /sfdx
+/secrets
+/log
+/ssh

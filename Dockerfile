@@ -24,10 +24,14 @@ RUN add-apt-repository ppa:longsleep/golang-backports
 # php-xml  phpのxmlパッケージ(phpのLSPで使用していたような？）
 # fd-find  ファイル検索ツール(telecopeでより早い検索に使用)
 # libunibilium-dev  なくてもneovimは動くが、色がおかしくなる
-# openjdk-21-jd java21の実行環境(apexのformatterやLSPの必要)
+# openjdk-11-jd java11の実行環境(apexのformatterに必要)
+# lualocks luaのパッケージ管理ツール
+# lynx テキストブラウザ(Copilot Chatで使用）
+# python3-pip pythonのパッケージ管理ツール
+# universal-ctags ソースコードのタグ生成ツール(salesforceのプラグイン(sf)でApexジャンプ拡張に使用)
 RUN apt update && \
     apt-get update && \
-    apt install -y curl git ripgrep tar unzip vim wget build-essential nodejs golang-go npm php-xml fd-find libunibilium-dev openjdk-21-jdk
+    apt install -y curl git ripgrep tar unzip vim wget build-essential nodejs golang-go npm php-xml fd-find libunibilium-dev openjdk-21-jdk luarocks lynx python3-pip universal-ctags
 
 # （途中でlocation聞かれて -y だけでは突破できない）
 ENV DEBIAN_FRONTEND=noninteractive
@@ -66,10 +70,13 @@ RUN npm install --global prettier prettier-plugin-apex @salesforce/cli
 # インストールに失敗する場合は、hash値が違っている可能性が高いので公式を参考に修正する
 # 公式　https://getcomposer.org/download/
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-RUN php -r "if (hash_file('sha384', 'composer-setup.php') === 'dac665fdc30fdd8ec78b38b9800061b4150413ff2e3b6f88543c636f7cd84f6db9189d43a81e5503cda447da73c7e5b6') { echo 'Installer verified'.PHP_EOL; } else { echo 'Installer corrupt'.PHP_EOL; unlink('composer-setup.php'); exit(1); }"
+RUN php -r "if (hash_file('sha384', 'composer-setup.php') === 'c8b085408188070d5f52bcfe4ecfbee5f727afa458b2573b8eaaf77b3419b0bf2768dc67c86944da1544f06fa544fd47') { echo 'Installer verified'.PHP_EOL; } else { echo 'Installer corrupt'.PHP_EOL; unlink('composer-setup.php'); exit(1); }"
 RUN php composer-setup.php
 RUN php -r "unlink('composer-setup.php');"
 RUN mv ./composer.phar /usr/bin/composer && chmod +x /usr/bin/composer 
+
+# Copilot Chatのトークンカウント用のtiktokenをインストール
+RUN pip install tiktoken
 
 # よくわからんがもう一回apt-get updateを実行しないとエラーになってしまう
 RUN apt-get update && \
