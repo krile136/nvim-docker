@@ -1,4 +1,3 @@
-version: '3'
 services: 
     neovim:
         build: ./
@@ -22,6 +21,8 @@ services:
             - ./github-copilot:/root/.config/github-copilot
             # ホストOSで取得したバッテリー状況を共有する 
             - ./batteryStatus.txt:/root/batteryStatus.txt
+            # ホストOSのカレンダー情報を共有する
+            - ./calendar_lualine.txt:/root/calendar_lualine.txt
             # READMEをコンテナ内でも編集できるように
             - ./README.md:/root/README.md
             # sf cliの認証情報をコンテナにコピー

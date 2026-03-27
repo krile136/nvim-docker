@@ -7,7 +7,7 @@ return {
     require("salesforce").setup {
       popup = {
         width = 200,
-        height = 40,
+        height = 50,
       },
     }
 

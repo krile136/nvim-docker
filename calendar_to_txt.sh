@@ -1,0 +1,7 @@
+/opt/homebrew/bin/icalBuddy -ic "予定表" -b "" -n -df "%H:%M" -po title,datetime,location -eep notes,attendees eventsToday+1 | awk '
+  /^[^ ]/ {if (NR>1) print ""; printf "%s,", $0}
+  /^    [0-9]{2}:[0-9]{2}/ || /^    tomorrow/ || /^    today/ {printf "%s,", substr($0,5)}
+  /^    location:/ {printf "%s", substr($0,15)}
+  END {print ""}
+' > ./calendar_lualine.txt
+

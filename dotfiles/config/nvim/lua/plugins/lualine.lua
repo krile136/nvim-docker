@@ -1,6 +1,9 @@
+_G.vim = vim
+
 return {
   'nvim-lualine/lualine.nvim',
   config = function()
+
     -- Bubbles config for lualine
     -- Author: lokesh-krishna
     -- MIT license, see LICENSE for more details.
@@ -61,6 +64,195 @@ return {
       return "%#TimeIcon# %#StatusText# " .. os.date("%H:%M:%S")
     end
 
+
+    -- 現在日付をアイコンと一緒に表示する
+    local function current_date()
+      return "%#DateIcon# %#StatusText# " .. os.date("%m/%d(%a)")
+    end
+
+    -- 現在のSalesforce組織のエイリアスを表示する
+    local function showCurrentSalesforceOrg()
+      local alias = require 'salesforce.org_manager':get_default_alias()
+      if alias and alias ~= "" then
+        return "%#SalesforceIcon#󰢎 %#SalesforceOrgDefault# " .. alias
+      end
+      return ""
+    end
+
+    -- パスのパンくずリスト表示
+    -- nvim-web-devicons が読み込まれているか確認
+    local devicons_ok, devicons = pcall(require, 'nvim-web-devicons')
+    local file_icon = " " -- (U+F15C)
+    local dir_icon = "%#LualineDirIcon# "
+    local root_icon = ""
+    local lualine_hl_cache = {
+      last_original_hl = nil, -- 最後に適用した devicon の HL グループ名
+    }
+
+    -- LualineBreadcrumbFileIcon の 'guifg' を動的に変更するヘルパー
+    local function get_dynamic_devicon(filename, default_icon_str)
+      local base_hl = "LualineBreadcrumbText" -- ファイル名用のHL
+
+      -- string.match を使い、末尾が .cls, .cmp, .triggerかどうかをチェック
+      if filename:match("%.cls$") or filename:match("%.cmp$") or filename:match("%.trigger$") then
+        local sf_icon = "󰢎 " -- Salesforce icon + space
+        local sf_hl = "LualineBreadcrumbSalesforceIcon"
+
+        -- LualineBreadcrumbFileIcon を更新する必要はない（使っていない）ため
+        -- キャッシュには触らず、専用のハイライトで返す
+        return string.format("%%#%s#%s%%#%s#%s", sf_hl, sf_icon, base_hl, filename)
+      end
+      if not devicons_ok then
+        -- devicon がなければ固定アイコン
+        return string.format("%%#%s#%s%s", base_hl, default_icon_str, filename)
+      end
+
+      local icon, original_hl_name = devicons.get_icon(filename)
+
+      if not icon then
+        icon = default_icon_str -- 強制的にデフォルトアイコンをセット
+        original_hl_name = nil  -- ハイライトもリセット
+      else
+        icon = icon .. " "      -- 見つかった場合のみスペースを追加
+      end
+
+      if not original_hl_name then
+        if lualine_hl_cache.last_original_hl ~= "FALLBACK_TO_BASE" then
+          pcall(vim.api.nvim_set_hl, 0, "LualineBreadcrumbFileIcon", { link = base_hl })
+          lualine_hl_cache.last_original_hl = "FALLBACK_TO_BASE"
+        end
+        return string.format("%%#LualineBreadcrumbFileIcon#%s%%#%s#%s", default_icon_str, base_hl, filename)
+      end
+
+      -- 最後に適用したHL (例: DevIconLua) と違っていたら、
+      -- LualineBreadcrumbFileIcon の色を更新
+      if original_hl_name ~= lualine_hl_cache.last_original_hl then
+        -- 1. 元のHL (DevIconLua) から 'guifg' を取得
+        local ok, hl_info = pcall(vim.api.nvim_get_hl_by_name, original_hl_name, true)
+        local fg_color = (ok and hl_info.foreground) or nil
+
+        if fg_color then
+          -- 2. 'guifg' だけ抽出し、'guibg' は #080808 でHLを上書き
+          pcall(vim.api.nvim_set_hl, 0, "LualineBreadcrumbFileIcon", {
+            fg = fg_color,
+            bg = colors.black -- '#080808'
+          })
+        else
+          -- 3. 元のHLから 'guifg' が取れなかった場合 (フォールバック)
+          pcall(vim.api.nvim_set_hl, 0, "LualineBreadcrumbFileIcon", {
+            link = base_hl -- LualineBreadcrumbText にリンク
+          })
+        end
+
+        -- 4. 適用したHL (DevIconLua) をキャッシュに保存
+        lualine_hl_cache.last_original_hl = original_hl_name
+      end
+
+      -- 5. 動的に色が変わるHLをアイコンに、ベースHLをファイル名に適用
+      return string.format("%%#LualineBreadcrumbFileIcon#%s%%#%s#%s", icon, base_hl, filename)
+    end
+
+    local function breadcrumbs()
+      local is_oil_buffer = (vim.bo.filetype == 'oil')
+      local path_source = vim.fn.expand('%')
+      local rel_path
+
+      if is_oil_buffer then
+        -- 1. oilバッファの場合 (例: oil:///Users/foo/bar)
+        path_source = path_source:gsub("^oil://", "")
+        rel_path = vim.fn.fnamemodify(path_source, ':.')
+      else
+        -- 2. 通常のファイルバッファ
+        rel_path = vim.fn.fnamemodify(path_source, ':.')
+      end
+
+      -- ルート、[No Name]、または CWD のファイル を処理
+      if rel_path == '' or rel_path == '.' then
+        -- 1. oil でルートを開いている場合 (最優先)
+        if is_oil_buffer then
+          -- このケースでは "ROOT" のみを表示して即時リターンする
+          return string.format("%%#LualineRootIcon#%s %%#LualineBreadcrumbText#ROOT", root_icon)
+        end
+
+        -- 2. [No Name] バッファ
+        local filename_only = vim.fn.expand('%:t')
+        if filename_only == '' then
+          return "%#Comment# [No Name] " -- [No Name] バッファ
+        end
+
+        -- 3. CWD にあるファイル (e.g. README.md)
+        -- ヘルパー関数を呼び出し、下のロジックに流す
+        return get_dynamic_devicon(filename_only, file_icon)
+      end
+
+      local parts = {}
+
+      if rel_path ~= '.' and rel_path ~= '' then
+        for part in string.gmatch(rel_path, "([^/]+)") do
+          table.insert(parts, part)
+        end
+      else
+        -- CWD のファイル (上記 3. のケース)
+        local filename_only = vim.fn.expand('%:t')
+        if filename_only ~= '' then
+          table.insert(parts, filename_only)
+        end
+      end
+
+      local components = {}
+
+      -- 常に "ROOT" から始める
+      local root_str = string.format("%%#LualineRootIcon#%s %%#LualineBreadcrumbText#ROOT", root_icon)
+      table.insert(components, root_str)
+
+      if #parts == 0 then
+        return table.concat(components) -- "ROOT" のみ返す
+      end
+
+      -- 区切り文字 (› (U+203A) を使用)
+      local separator = "%#LualineBreadcrumbSeparator# › "
+
+      -- oil バッファかどうかで、最後の要素をどう扱うか分岐
+      local loop_end = #parts
+      if not is_oil_buffer then
+        loop_end = #parts - 1 -- 通常ファイルなら、最後はファイル名として別処理
+      end
+
+      if loop_end < 0 then loop_end = 0 end
+
+      -- ディレクトリ部分
+      for i = 1, loop_end do
+        local part = parts[i]
+        table.insert(components, dir_icon .. "%#LualineBreadcrumbText#" .. part)
+      end
+
+      -- ファイル名部分 (通常ファイルバッファの場合のみ実行)
+      if not is_oil_buffer then
+        if #parts > 0 then
+          local filename = parts[#parts]
+          local file_str = get_dynamic_devicon(filename, file_icon)
+          table.insert(components, file_str)
+        end
+      end
+
+      -- 全てのコンポーネントを区切り文字で連結
+      return table.concat(components, separator)
+    end
+
+    -- 現在のファイル名（とアイコン）だけを表示する関数
+    -- -----------------------------------------------------------
+    local function current_file_with_icon()
+      local is_oil_buffer = (vim.bo.filetype == 'oil')
+      local filename_only = vim.fn.expand('%:t')
+
+      -- oil でサブディレクトリを開いている or [No Name] バッファの場合は空文字を返す
+      if is_oil_buffer or filename_only == '' then
+        return ''
+      end
+
+      -- 通常のファイル
+      return get_dynamic_devicon(filename_only, file_icon)
+    end
 
     -- ブランチ名を表示する
     -- masterとmainに対して警告を出したいのでカスタム関数を使用
@@ -138,6 +330,68 @@ return {
       return battery_message
     end
 
+    local cached_calendar_event = ""
+    local last_calendar_check_time = 0
+    local calendar_cache_duration = 20000 -- キャッシュの有効期間（ミリ秒）
+
+    local function next_calendar_event()
+      local now = vim.loop.now()
+      local mode = vim.api.nvim_get_mode().mode
+      if mode == 'v' or mode == 'V' or mode == '\22' then
+        return ""
+      end
+
+      if not cached_calendar_event or (now - last_calendar_check_time > calendar_cache_duration) then
+        local file, _ = io.open("/root/calendar_lualine.txt", "r")
+        if not file then
+          cached_calendar_event = ""
+        else
+          local date_now = os.date("*t")
+          local current_minutes = date_now.hour * 60 + date_now.min
+          local next_event = nil
+          local next_start_minutes = nil
+
+          for line in file:lines() do
+            local title, time_str, place = line:match("([^,]+),([^,]+),(.+)")
+            if title and time_str and place then
+              title = title:gsub("%s*%b()", "")
+              local start_h, start_m, end_h, end_m = time_str:match("today at (%d+):(%d+) %- (%d+):(%d+)")
+              if start_h and start_m and end_h and end_m then
+                local start_minutes = tonumber(start_h) * 60 + tonumber(start_m)
+                if start_minutes >= current_minutes then
+                  if not next_start_minutes or start_minutes < next_start_minutes then
+                    next_start_minutes = start_minutes
+                    local places = {}
+                    for p in place:gmatch("[^;]+") do
+                      if not p:find("Microsoft") then
+                        table.insert(places, vim.trim(p))
+                      end
+                    end
+                    local place_str = table.concat(places, "; ")
+                    next_event = {
+                      title = title,
+                      time = string.format("%s:%s - %s:%s", start_h, start_m, end_h, end_m),
+                      place = place_str
+                    }
+                  end
+                end
+              end
+            end
+          end
+          file:close()
+          if next_event then
+            cached_calendar_event = string.format("%s | %s | %s", next_event.title, next_event.time,
+              next_event.place)
+          else
+            cached_calendar_event = "本日の次の予定はありません"
+          end
+        end
+        last_calendar_check_time = now
+      end
+
+      return cached_calendar_event
+    end
+
     -- 選択範囲の行数と文字数を表示する
     local function selectionCount()
       local mode = vim.fn.mode()
@@ -163,7 +417,7 @@ return {
         local line_len = vim.fn.strlen(line)
         local s_pos = (i == start_line) and start_pos or 1
         local e_pos = (i == end_line) and end_pos or line_len + 1
-        chars = chars + vim.fn.strchars(line:sub(s_pos, e_pos - 1))
+        chars = chars + vim.fn.strchars(line:sub(s_pos, e_pos))
       end
 
       local lines = math.abs(end_line - start_line) + 1
@@ -174,30 +428,42 @@ return {
       options = {
         theme = bubbles_theme,
         component_separators = '|',
+        active = function()
+          return vim.bo.buftype == ''
+        end,
+      },
+      tabline = {
+        lualine_a = {
+        },
+        lualine_b = {
+          { showCurrentSalesforceOrg },
+        },
+        lualine_c = {
+          { breadcrumbs },
+        },
+        lualine_x = {
+          -- { next_calendar_event },
+          { selectionCount },
+        },
+        lualine_y = {
+        },
+        lualine_z = {
+        },
       },
       sections = {
         lualine_a = { 'mode' },
-        lualine_b = {},
+        lualine_b = {
+        },
         lualine_c = {
-          { 'filename', path = 0 },
+          { current_file_with_icon }
         },
         lualine_x = {
           { 'diagnostics' },
-          { 'diff' }
+          { 'diff' },
         },
         lualine_y = {
           { 'filetype' },
-          { lsp_clients, color = { fg = colors.white, bg = colors.grey } },
-          {
-            function()
-              local alias = require 'salesforce.org_manager':get_default_alias()
-              if alias and alias ~= "" then
-                return "%#SalesforceIcon#󰢎 %#StatusText# " .. alias
-              end
-              return ""
-            end,
-            icon = nil, -- アイコンは関数内で動的に設定
-          },
+          { lsp_clients,        color = { fg = colors.white, bg = colors.grey } },
           { branch_with_icon,   color = { fg = colors.white, bg = colors.grey } },
           { encoding_with_icon, color = { fg = colors.white, bg = colors.grey } },
           {
@@ -210,6 +476,7 @@ return {
             },
           },
           { battery_status, color = { fg = colors.white, bg = colors.grey } },
+          { current_date,   color = { fg = colors.white, bg = colors.grey } },
           { current_time,   color = { fg = colors.white, bg = colors.grey } },
           { 'copilot',
             symbols = {
@@ -238,8 +505,6 @@ return {
           'location'
         }
       },
-
-
       inactive_sections = {
         lualine_a = {},
         lualine_b = {},
@@ -247,19 +512,6 @@ return {
         lualine_x = {},
         lualine_y = {},
         lualine_z = {},
-      },
-      tabline = {
-        lualine_c = {
-          {
-            'filename',
-            path = 1, -- 1: relative path
-            color = { fg = colors.darkGrey },
-          },
-        },
-        lualine_x = {
-          { selectionCount },
-        },
-        lualine_y = {},
       },
       extensions = {},
     }

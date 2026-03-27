@@ -10,7 +10,11 @@ return {
         "markdown_inline",
         "typescript",
         "apex",
+        "soql",
+        "sosl",
+        "sflog",
         "html",
+        "http",
       },
       highlight = {
         enable = true,

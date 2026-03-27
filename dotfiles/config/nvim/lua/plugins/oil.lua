@@ -11,7 +11,19 @@ return {
   -- dependencies = { { "echasnovski/mini.icons", opts = {} } },
   dependencies = { "nvim-tree/nvim-web-devicons" }, -- use if prefer nvim-web-devicons
   config = function()
-    map('n', '<Leader>e', ':Oil<CR>', {noremap=true})
+    map('n', '<Leader>e', '<Cmd>Oil<CR>', { noremap = true })
+
+    -- Toggle function
+    vim.api.nvim_create_user_command("OilToggleClsMeta", function()
+      show_cls_meta = not show_cls_meta
+      vim.notify("Show cls-meta: " .. tostring(show_cls_meta))
+      -- Reload Oil buffer if open
+      local oil = require("oil")
+      if oil.get_current_dir() then
+        oil.open(oil.get_current_dir())
+      end
+    end, {})
+
 
     require('oil').setup({
       win_options = {
@@ -31,16 +43,13 @@ return {
         },
       },
       view_options = {
-        -- Show files and directories that start with "."
         show_hidden = true,
         is_always_hidden = function(name, bufnr)
-          -- 名前に"cls-meta" が含まれるファイルは非表示
-          if name:match("cls%-meta") then
+          if not show_cls_meta and name:match("cls%-meta") then
             return true
           end
           return false
         end,
-        -- Customize the highlight group for the file name
         highlight_filename = function(entry, is_hidden, is_link_target, is_link_orphan)
         end,
       }
