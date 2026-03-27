@@ -1,6 +1,5 @@
 FROM ubuntu:22.04
 
-# fd-findはtelescopeのより高速なファイル検索に使うっぽい
 # 最新のミドルウェアを落とせるようにadd-apt-repositoryを使えるようにする
 RUN apt update && \
     apt-get update && \
@@ -46,13 +45,6 @@ RUN wget https://github.com/neovim/neovim/releases/download/v0.10.4/nvim-linux-x
     rm -rf nvim-linux-x86_64 && \
     rm nvim-linux-x86_64.tar.gz
 
-# nvim tree-sitter を使うために、tree-sitterをインストールするが
-# npm経由だとうまく行かないのでcargo経由でインストールする。
-# そのためにrustをインストールする
-# RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
-# ENV PATH="/root/.cargo/bin:$PATH"
-# RUN cargo install tree-sitter-cli
-
 # vue(typescript)のLSPのためにnpmを使うが、aptで入れているnpmは古いので
 # バージョン管理のnを使って最新版を入れる（ついでにnodejsも最新版にする）
 RUN npm install n -g
@@ -70,7 +62,7 @@ RUN npm install --global prettier prettier-plugin-apex @salesforce/cli
 # インストールに失敗する場合は、hash値が違っている可能性が高いので公式を参考に修正する
 # 公式　https://getcomposer.org/download/
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-RUN php -r "if (hash_file('sha384', 'composer-setup.php') === 'ed0feb545ba87161262f2d45a633e34f591ebb3381f2e0063c345ebea4d228dd0043083717770234ec00c5a9f9593792') { echo 'Installer verified'.PHP_EOL; } else { echo 'Installer corrupt'.PHP_EOL; unlink('composer-setup.php'); exit(1); }"
+RUN php -r "if (hash_file('sha384', 'composer-setup.php') === 'c8b085408188070d5f52bcfe4ecfbee5f727afa458b2573b8eaaf77b3419b0bf2768dc67c86944da1544f06fa544fd47') { echo 'Installer verified'.PHP_EOL; } else { echo 'Installer corrupt'.PHP_EOL; unlink('composer-setup.php'); exit(1); }"
 RUN php composer-setup.php
 RUN php -r "unlink('composer-setup.php');"
 RUN mv ./composer.phar /usr/bin/composer && chmod +x /usr/bin/composer 

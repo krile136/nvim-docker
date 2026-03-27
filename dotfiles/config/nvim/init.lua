@@ -1,3 +1,5 @@
+_G.vim = vim
+
 --------------------- basic settings ---------------------
 require('settings/basic')
 
@@ -7,12 +9,12 @@ require('settings/keymap')
 --------------------- plugins ---------------------
 require('settings/pluginSetup')
 
-vim.o.termguicolors = true  -- nvim-colorizerのためにプラグインを読み込む前に設定する
+vim.o.termguicolors = true -- nvim-colorizerのためにプラグインを読み込む前に設定する
 
 local lazyOpts = {
- 	ui = {
-	  border = "rounded",
-	},
+  ui = {
+    border = "rounded",
+  },
 }
 require("lazy").setup({
   require('plugins/comment'),
@@ -26,8 +28,8 @@ require("lazy").setup({
   require('plugins/mason-tool-installer'),
   require('plugins/mason'),
   require('plugins/neoscroll'),
-  require('plugins/noice'),
   require('plugins/none-ls'),
+  require('plugins/noice'),
   require('plugins/nvim-cmp'),
   require('plugins/nvim-scrollbar'),
   require('plugins/nvim-treesitter'),
@@ -48,7 +50,11 @@ require("lazy").setup({
   -- 後で読み込むことで正常に動くようになる
   require('plugins/modes'),
   require('plugins/hlchunk'),
+
 }, lazyOpts)
+
+-- 垂直分割線の色を変更
+vim.cmd('highlight VertSplit guifg=#808080')
 
 --------------------- floatの背景色をなくす ---------------------
 vim.cmd [[
@@ -56,7 +62,8 @@ vim.cmd [[
   highlight FloatBorder guibg=NONE
 ]]
 
--- Define highlight groups for icons
+
+-- lualineのアイコンやテキストの色を変更(ここでやらないと色が変わらない)
 vim.cmd('highlight LspIcon guifg=#99FF99 guibg=#303030')
 vim.cmd('highlight TimeIcon guifg=#99FFFF guibg=#303030')
 vim.cmd('highlight DateIcon guifg=#88B04B guibg=#303030')
@@ -71,12 +78,17 @@ vim.cmd('highlight BatteryGoodIcon guifg=#66AACC guibg=#303030')
 vim.cmd('highlight BatteryFullIcon guifg=#3BAF75 guibg=#303030')
 vim.cmd('highlight StatusText guifg=#C5C5C5 guibg=#303030')
 vim.cmd('highlight SalesforceIcon guifg=#459BD7 guibg=#303030')
+vim.cmd('highlight SalesforceOrgDefault guifg=#FFD700 guibg=#303030')
 vim.cmd('highlight FileFormatIcon guifg=#FF69B4 guibg=#303030')
 vim.cmd('highlight FileFormatText guifg=#C5C5C5 guibg=#303030')
+vim.cmd('highlight LualineBreadcrumbSeparator guibg=#080808')
+vim.cmd('highlight LualineBreadcrumbText guifg=#C5C5C5 guibg=#080808')
+vim.cmd('highlight LualineBreadcrumbSalesforceIcon guifg=#459BD7 guibg=#080808')
+vim.cmd('highlight LualineDirIcon guifg=#99FFFF guibg=#080808')
+vim.cmd('highlight LualineRootIcon guifg=#d183e8 guibg=#080808')
+vim.cmd('highlight LualineBreadcrumbCurrentFileText guifg=#c6c6c6 guibg=#080808')
 
-vim.cmd('highlight VertSplit guifg=#808080')
-
-
+--------------------- filetype設定 ---------------------
 vim.filetype.add({
   extension = {
     cls = 'apex',
@@ -101,7 +113,7 @@ vim.api.nvim_create_autocmd("InsertEnter", {
     end
   end,
 })
-vim.api.nvim_create_autocmd({"InsertLeave","TextYankPost", "TextChanged"}, {
+vim.api.nvim_create_autocmd({ "InsertLeave", "TextYankPost", "TextChanged" }, {
   pattern = "*",
   callback = function()
     if vim.bo.buftype == "" then
@@ -120,3 +132,29 @@ vim.treesitter.start = (function(wrapped)
     pcall(wrapped, bufnr, lang)
   end
 end)(vim.treesitter.start)
+
+
+-- noiceの通知のnvim-notifyのハイライトがリセットされることが起きるので、強制的に上書きする
+local function setup_notify_highlights()
+  vim.cmd [[
+    highlight NotifyERRORBorder guifg=#8A1F1F
+    highlight NotifyWARNBorder  guifg=#79491D
+    highlight NotifyINFOBorder  guifg=#4F6752
+    highlight NotifyDEBUGBorder guifg=#8B8B8B
+    highlight NotifyTRACEBorder guifg=#4F3552
+
+    highlight NotifyERRORIcon guifg=#F70067
+    highlight NotifyWARNIcon  guifg=#F79000
+    highlight NotifyINFOIcon  guifg=#A9FF68
+    highlight NotifyDEBUGIcon guifg=#8B8B8B
+    highlight NotifyTRACEIcon guifg=#D484FF
+
+    highlight NotifyERRORTitle guifg=#F70067
+    highlight NotifyWARNTitle  guifg=#F79000
+    highlight NotifyINFOTitle  guifg=#A9FF68
+    highlight NotifyDEBUGTitle guifg=#8B8B8B
+    highlight NotifyTRACETitle guifg=#D484FF
+  ]]
+end
+-- nvim-notifyのハイライト設定を遅延実行
+vim.defer_fn(setup_notify_highlights, 100)
