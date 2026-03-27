@@ -1,6 +1,6 @@
 -- 色のリスト
 local colors = {
--- 鮮やかな基本色 (Vibrant Basics)
+  -- 鮮やかな基本色 (Vibrant Basics)
   { fg = "#FF6F61" }, -- 1. Coral (コーラルレッド)
   { fg = "#F67C1B" }, -- 2. Bright Orange (明るいオレンジ)
   { fg = "#E5D180" }, -- 3. Mellow Yellow (黄)
@@ -54,11 +54,11 @@ local queries = {
     ]],
     ignore_special_conditions = function(node)
       local var_name = vim.treesitter.get_node_text(node, 0)
-       -- var_nameの先頭が大文字かどうかを判定
-       if var_name:sub(1, 1):match("%u") then
-         return true
-       end
-       return false
+      -- var_nameの先頭が大文字かどうかを判定
+      if var_name:sub(1, 1):match("%u") then
+        return true
+      end
+      return false
     end,
     variable_query = [[
       (variable_declarator
@@ -123,13 +123,34 @@ local queries = {
     ]],
   },
   go = {
-    as ="go",
+    as = "go",
     ignore_query = "",
     ignore_special_conditions = function(node)
       return false;
     end,
     variable_query = [[
       (expression_list
+        (identifier) @variable
+      )
+      (argument_list
+        (identifier) @variable
+      )
+      (binary_expression
+        (identifier) @variable
+      )
+      (field_declaration
+        (field_identifier) @variable
+      )
+      (literal_element
+        (identifier) @variable
+      )
+      (range_clause
+        (identifier) @variable
+      )
+      (selector_expression
+        (identifier) @variable
+      )
+      (parameter_declaration
         (identifier) @variable
       )
     ]],
@@ -146,10 +167,10 @@ local queries = {
     ]]
   },
   typescript = {
-    as="typescript",
+    as = "typescript",
     ignore_query = [[
       (function_declaration name: (identifier) @function.name)
-      (call_expression 
+      (call_expression
         function: (member_expression
           property: (property_identifier) @method.call
         )
@@ -157,12 +178,11 @@ local queries = {
     ]],
     ignore_special_conditions = function(node)
       local var_name = vim.treesitter.get_node_text(node, 0)
-       -- var_nameの先頭が大文字かどうかを判定
-       if var_name:sub(1, 1):match("%u") then
-         return true
-       end
-       return false
-
+      -- var_nameの先頭が大文字かどうかを判定
+      if var_name:sub(1, 1):match("%u") then
+        return true
+      end
+      return false
     end,
     variable_query = [[
       (identifier) @variable
@@ -171,7 +191,7 @@ local queries = {
     ]]
   },
   typescriptreact = {
-    as="tsx",
+    as = "tsx",
     ignore_query = [[
     ]],
     ignore_special_conditions = function(node)
@@ -301,8 +321,8 @@ local function analyze_buffer()
       end
 
       if contains_special_characters(var_name)
-        or ignore_variables[var_name]
-        or queries[filetype].ignore_special_conditions(node)
+          or ignore_variables[var_name]
+          or queries[filetype].ignore_special_conditions(node)
       then
         goto continue
       end
